@@ -1,0 +1,44 @@
+
+services:
+  ray-head:
+    build: .
+    container_name: ray-head
+    image: ray-lecture-custom:latest # Build from local Dockerfile
+    ports:
+      - "8265:8265"   # Dashboard
+      - "10001:10001" # Ray Client
+      - "6379:6379"   # GCS
+    command: ray start --head --port=6379 --dashboard-host=0.0.0.0 --block
+    shm_size: '2gb'
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+
+  ray-worker:
+    image: ray-lecture-custom:latest
+    depends_on:
+      - ray-head
+    command: ray start --address=ray-head:6379 --block
+    shm_size: '2gb'
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+    # Start 2 workers by default
+    scale: 2
+    
+# --- LECTURE CHEAT SHEET ---
+# 1. BUILD the custom image first:
+#    docker-compose build
+#
+# 2. START the cluster (head + 1 worker):
+#    docker-compose up -d
+#
+# 3. SCALE to see real-time speedup:
+#    docker-compose up -d --scale ray-worker=3
+#
+# 4. MONITOR the "machines":
+#    docker stats
