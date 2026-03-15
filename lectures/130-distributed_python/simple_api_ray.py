@@ -30,7 +30,7 @@ def fibonacci(n: int):
 class FastAPIWrapper:
     pass
 
-serve.run(FastAPIWrapper.bind(), route_prefix="/")
+serve.run(FastAPIWrapper.bind(), route_prefix="/", blocking=True)
 
 # python simple_api_ray.py
 # http://localhost:8000/compute?n=10

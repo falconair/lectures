@@ -3,8 +3,8 @@ FROM rayproject/ray:latest-py310
 # Install the exact libraries needed for the lecture
 RUN pip install --no-cache-dir \
     scikit-learn==1.7.2 \
-    pandas \
-    numpy
+    pandas==2.3.3 \
+    numpy==2.2.6
 
 # Set the working directory
 WORKDIR /app

@@ -1,35 +1,39 @@
-
 services:
   ray-head:
     build: .
+    image: ray-lecture-custom:latest
     container_name: ray-head
-    image: ray-lecture-custom:latest # Build from local Dockerfile
+    hostname: ray-head
     ports:
-      - "8265:8265"   # Dashboard
+      - "8265:8265"   # Ray Dashboard
       - "10001:10001" # Ray Client
       - "6379:6379"   # GCS
-    command: ray start --head --port=6379 --dashboard-host=0.0.0.0 --block
+    command: >
+      ray start --head --node-name=head-node --port=6379 
+      --dashboard-host=0.0.0.0 --num-cpus=0 --block
     shm_size: '2gb'
     deploy:
       resources:
         limits:
-          cpus: '1.0'
-          memory: 2G
+          cpus: '2.0'
+          memory: 6G
 
   ray-worker:
     image: ray-lecture-custom:latest
     depends_on:
       - ray-head
-    command: ray start --address=ray-head:6379 --block
+    # Using bash -c to keep the unique hostname logic for your readable names
+    command: >
+      bash -c "ray start --address=ray-head:6379 
+      --node-name=worker-$$HOSTNAME --block"
     shm_size: '2gb'
     deploy:
       resources:
         limits:
           cpus: '1.0'
           memory: 2G
-    # Start 2 workers by default
-    scale: 2
-    
+    scale: 4
+
 # --- LECTURE CHEAT SHEET ---
 # 1. BUILD the custom image first:
 #    docker-compose build

@@ -19,7 +19,7 @@
     "loggers": {
         "root": {
             "level": "DEBUG",
-            "handlers": ["console"]
+            "handlers": ["console", "file"]
         },
         "app": {
             "level": "DEBUG",

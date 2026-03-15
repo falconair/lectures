@@ -6,3 +6,5 @@
 postcell.conf
 postcell.log
 __pycache__/
+**/*.cpython-310-darwin..so
+**/*.cpython-310-darwin..so

@@ -59,6 +59,7 @@ c:\
 
 - Use `ssh` to log in:
   ```bash
+  ssh <username>@<remote_ip_address>
   ssh -l <username> <remote_ip_address>
   ```
   - **Example:** `ssh -l student 192.168.1.10`
