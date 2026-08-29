@@ -148,7 +148,7 @@ LIVE_NOTE = """
 """
 
 
-def render_index(config, books, base="./"):
+def render_index(config, books, base="./", extra_head=""):
     cards = []
     for b in books:
         cards.append(f"""
@@ -173,7 +173,7 @@ def render_index(config, books, base="./"):
 </main>
 <script src="{base}search.js"></script>
 """
-    return _shell(config.get("site_title", "Lecture notes"), body, base)
+    return _shell(config.get("site_title", "Lecture notes"), body, base, extra_head)
 
 
 def render_book(config, book, base="../"):

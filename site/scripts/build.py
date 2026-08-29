@@ -195,6 +195,18 @@ def write_book_layer(config, base_url):
     """Landing page, per-book indexes, nav lookup and search index."""
     books = pages.collect(config, REPO)
 
+    # JupyterLite reads its own configuration back out of the root index.html
+    # (config-utils.js getPageConfig fetches it and looks for
+    # #jupyter-config-data). Our landing page replaces that file, so the config
+    # script has to be carried across or every notebook page fails to boot.
+    root_index = OUT / "index.html"
+    m = re.search(r'<script id="jupyter-config-data".*?</script>',
+                  root_index.read_text(), re.S)
+    if not m:
+        sys.exit("ERROR: no jupyter-config-data found in the generated root "
+                 "index.html; refusing to overwrite it and break the apps")
+    config_script = m.group(0)
+
     (OUT / "book-nav.json").write_text(json.dumps(pages.nav_json(books)))
     (OUT / "search.json").write_text(
         json.dumps(pages.search_index(books, REPO), ensure_ascii=False))
@@ -204,7 +216,8 @@ def write_book_layer(config, base_url):
 
     # JupyterLite writes its own index.html at the root; ours replaces it as
     # the front door, and its tree view stays reachable at /tree/.
-    (OUT / "index.html").write_text(pages.render_index(config, books, base="./"))
+    (OUT / "index.html").write_text(
+        pages.render_index(config, books, base="./", extra_head=config_script))
 
     bookdir = OUT / "books"
     bookdir.mkdir(exist_ok=True)
