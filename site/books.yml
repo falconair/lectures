@@ -1,0 +1,130 @@
+# Book map for the online edition.
+#
+# Each book lists lecture notebooks in reading order. A notebook may appear in
+# more than one book — these were taught as separate courses that share material.
+# Paths are relative to the repository root.
+#
+# This file is a DRAFT for the author to correct: the groupings were inferred
+# from directory numbering and notebook titles, not from how the courses were
+# actually delivered.
+
+site_title: "Lecture notes"
+author: "Shahbaz Chaudhary"
+
+books:
+
+  - id: intro-programming
+    title: "An Introduction to Programming"
+    blurb: >
+      For readers who have never programmed. Starts at the console and builds
+      up to writing and running your first programs.
+    chapters:
+      - lectures/005_intro_to_consoles/intro_to_consoles.ipynb
+      - lectures/010_programming_vs_calculator/programming_vs_calculator.ipynb
+      - lectures/015_first_programs/first_programs.ipynb
+      - lectures/020_intro_to_jupyter/10 - Intro To Jupyter (not technical).ipynb
+      - lectures/020_intro_to_jupyter/20 - Intro To Jupyter (technical).ipynb
+      - lectures/020_intro_to_jupyter/30 - Intro To Widgets.ipynb
+      - lectures/040_basic_computer_architecture/basic_computer_architecture.ipynb
+      - lectures/065_secret_lives_of_text_files/Secret Lives of Text Files.ipynb
+      - lectures/035_how_to_read_technical_docs/how_to_read_technical_docs.ipynb
+      - lectures/060_learn_command_line/linux_command_line.ipynb
+      - lectures/060_learn_command_line/generate-ssh-keys.ipynb
+
+  - id: intro-python
+    title: "An Introduction to Python"
+    blurb: >
+      The Python language itself, from variables to decorators and async.
+      Assumes you can already run code in a notebook.
+    chapters:
+      - lectures/025_all_of_python_basics/090-roadmap.ipynb
+      - lectures/025_all_of_python_basics/100-all_of_python_basics.ipynb
+      - lectures/025_all_of_python_basics/110-variables.ipynb
+      - lectures/025_all_of_python_basics/130-numbers.ipynb
+      - lectures/025_all_of_python_basics/140-strings.ipynb
+      - lectures/025_all_of_python_basics/145-boolean_algebra.ipynb
+      - lectures/025_all_of_python_basics/220-conditonals_and_None.ipynb
+      - lectures/025_all_of_python_basics/210-loops.ipynb
+      - lectures/025_all_of_python_basics/180-lists.ipynb
+      - lectures/025_all_of_python_basics/170-dictionaries.ipynb
+      - lectures/025_all_of_python_basics/190-comprehensions_and_generators.ipynb
+      - lectures/025_all_of_python_basics/120-basic_functions.ipynb
+      - lectures/025_all_of_python_basics/230-functions_argument_types.ipynb
+      - lectures/025_all_of_python_basics/240-functions_lambda_and_higherorder.ipynb
+      - lectures/025_all_of_python_basics/245-functions-decorators.ipynb
+      - lectures/025_all_of_python_basics/250-functions_recursion.ipynb
+      - lectures/025_all_of_python_basics/200-classes.ipynb
+      - lectures/025_all_of_python_basics/280-exceptions.ipynb
+      - lectures/025_all_of_python_basics/290-context_managers.ipynb
+      - lectures/025_all_of_python_basics/260-all_of_python_regexes.ipynb
+      - lectures/025_all_of_python_basics/310-async.ipynb
+      - lectures/025_all_of_python_basics/150-basic_plotting.ipynb
+      - lectures/025_all_of_python_basics/095-all_of_python_faster_basics.ipynb
+      - lectures/140-algorithms_datastructs/100-data_structures.ipynb
+      - lectures/140-algorithms_datastructs/110-algorithms.ipynb
+
+  - id: ml-engineering
+    title: "Machine Learning Engineering in Python"
+    blurb: >
+      Taking models beyond the notebook: packaging, testing, serving,
+      monitoring, containers and distributed compute.
+    chapters:
+      - lectures/070_scikit_learn/90-ml-overview.ipynb
+      - lectures/070_scikit_learn/100-scikit-learn-method_behind_the_madness.ipynb
+      - lectures/070_scikit_learn/110-unsupervised_learning.ipynb
+      - lectures/070_scikit_learn/105-scikit-learn-run_saved_model.ipynb
+      - lectures/070_scikit_learn/120-model_monitoring.ipynb
+      - lectures/075_web_services/120-bank_churners_classifier_model.ipynb
+      - lectures/075_web_services/consume_services.ipynb
+      - lectures/075_web_services/130-load_test.ipynb
+      - lectures/080_env_pkg_management/010-package_management.ipynb
+      - lectures/110_python_py_files/100-program-inputs.ipynb
+      - lectures/110_python_py_files/110-program-run-type.ipynb
+      - lectures/110_python_py_files/120-clean-code.ipynb
+      - lectures/090_python_tools/010-jupyter-debugger.ipynb
+      - lectures/090_python_tools/030-python-logging.ipynb
+      - lectures/090_python_tools/040-python-unit-tests.ipynb
+      - lectures/090_python_tools/050-type_safety.ipynb
+      - lectures/100_design_patterns/100-design-patterns.ipynb
+      - lectures/120_dockerize_python_app/100-yaml.ipynb
+      - lectures/180-workflow-management/100-workflow-management.ipynb
+      - lectures/130-distributed_python/110-ray_intro.ipynb
+      - lectures/130-distributed_python/120-ray-train-tune.ipynb
+      - lectures/130-distributed_python/130-ray-serve.ipynb
+      - lectures/130-distributed_python/140-ray-cluster.ipynb
+      - lectures/130-distributed_python/150-ray-low-level.ipynb
+      - lectures/150-optimize_python/100-the_benchmark_game.ipynb
+      - lectures/150-optimize_python/110-python_vs_c.ipynb
+      - lectures/150-optimize_python/120-numba_cython_mypyc.ipynb
+
+  - id: financial-data-science
+    title: "Python for Financial Data Science"
+    blurb: >
+      The data stack: NumPy, Pandas, working with data too big for memory,
+      and the numerical methods underneath the models.
+    chapters:
+      - lectures/Data Science in Python.ipynb
+      - lectures/045_intro_to_numpy/intro_to_numpy.ipynb
+      - lectures/030_intro_to_pandas/100-pandas_quick_start.ipynb
+      - lectures/030_intro_to_pandas/110-pandas-overview-series.ipynb
+      - lectures/030_intro_to_pandas/120-pandas-overview-dataframes.ipynb
+      - lectures/030_intro_to_pandas/130-pandas-dataframes-operations.ipynb
+      - lectures/030_intro_to_pandas/140-pandas-dataframes-combining.ipynb
+      - lectures/030_intro_to_pandas/150-pandas-groupby.ipynb
+      - lectures/030_intro_to_pandas/160-pandas-index.ipynb
+      - lectures/030_intro_to_pandas/170-pandas-reshape-with-pivot-melt-stack.ipynb
+      - lectures/030_intro_to_pandas/180-pandas-operations_str_dt_apply.ipynb
+      - lectures/030_intro_to_pandas/190-pandas-datetime-index.ipynb
+      - lectures/170-data-download-methods/100-data-download-methods.ipynb
+      - lectures/190_data_representation_overview/100-data-represntation-overview.ipynb
+      - lectures/055_bigger_data_pandas/010-Combined-Taxi-Trips.ipynb
+      - lectures/160-pyspark/100-pyspark.ipynb
+      - lectures/045_intro_to_numpy/linear_regression_with_numpy.ipynb
+      - lectures/gradient_descent/Gradient Descent.ipynb
+
+# Deliberately not in any book yet — decide later:
+#   lectures/misc/*                      scratch and theme tests
+#   lectures/r_basics/*                  R, not Python
+#   lectures/055_bigger_data_pandas/0*   the taxi-trip walkthrough series (needs 2.7GB of data)
+#   lectures/090_python_tools/020-python-bytecode.ipynb   (no heading)
+#   lectures/150-optimize_python/130-TODO-*               marked TODO

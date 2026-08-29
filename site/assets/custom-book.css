@@ -1,0 +1,102 @@
+/* ---- JupyterLite "static book" skin -------------------------------------
+   Strips IDE chrome and re-typesets the notebook as a reading column.
+   Code cells stay live and editable; only the furniture is hidden.        */
+
+:root {
+  --book-measure: 46rem;
+  --book-ink: #1c1e21;
+  --book-muted: #6b7280;
+  --book-rule: #e6e8eb;
+  --book-code-bg: #f7f8fa;
+  --book-accent: #2f6f4f;
+}
+
+/* 1. Hide the IDE furniture ---------------------------------------------- */
+#menu-panel-wrapper,
+#top-panel-wrapper,
+#top-panel,
+.jp-MenuBar,
+.jp-NotebookPanel-toolbar,
+.jp-Toolbar,
+.jp-Cell-toolbar,
+.jp-InputPrompt,
+.jp-OutputPrompt,
+#jp-bottom-panel,
+.jp-StatusBar,
+.jp-WindowedPanel-scrollbar { display: none !important; }
+
+/* 2. Reading column ------------------------------------------------------ */
+.jp-Notebook {
+  background: #fff !important;
+  padding: 3.5rem 1.25rem 6rem !important;
+}
+.jp-Notebook > .jp-Cell,
+.jp-WindowedPanel-inner > .jp-Cell {
+  max-width: var(--book-measure);
+  margin: 0 auto !important;
+  padding: 0.35rem 0 !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+/* kill the active-cell blue bar and focus boxes */
+.jp-Cell.jp-mod-active .jp-InputArea-editor,
+.jp-Cell .jp-InputArea-editor { border: none !important; box-shadow: none !important; }
+.jp-Collapser, .jp-CellHeader, .jp-CellFooter { display: none !important; }
+
+/* 3. Prose --------------------------------------------------------------- */
+.jp-MarkdownOutput, .jp-RenderedHTMLCommon {
+  font-family: Charter, "Iowan Old Style", Georgia, serif !important;
+  font-size: 1.0625rem !important;
+  line-height: 1.7 !important;
+  color: var(--book-ink) !important;
+}
+.jp-RenderedHTMLCommon h1,
+.jp-RenderedHTMLCommon h2,
+.jp-RenderedHTMLCommon h3 {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  letter-spacing: -0.015em;
+  margin-top: 2.25rem !important;
+}
+.jp-RenderedHTMLCommon h1 { font-size: 1.9rem !important; }
+.jp-RenderedHTMLCommon h2 { font-size: 1.45rem !important; }
+.jp-RenderedHTMLCommon img { border-radius: 6px; }
+
+/* 4. Code as a styled block, not an IDE cell ----------------------------- */
+.jp-CodeCell .jp-InputArea-editor {
+  background: var(--book-code-bg) !important;
+  border-radius: 8px !important;
+  border-left: 3px solid var(--book-accent) !important;
+  padding: 0.65rem 0.85rem !important;
+}
+.jp-CodeCell .cm-editor { background: transparent !important; }
+.cm-content, .cm-line { font-size: 0.9rem !important; line-height: 1.55 !important; }
+
+/* 5. Outputs read as results, not console dumps -------------------------- */
+.jp-OutputArea-output {
+  background: transparent !important;
+  padding: 0.3rem 0 0.3rem 0.85rem !important;
+  border-left: 2px solid var(--book-rule) !important;
+  font-size: 0.9rem !important;
+}
+.jp-OutputArea-output pre { color: var(--book-muted) !important; }
+
+/* 6. Page ground: kill the IDE greys at every layer ---------------------- */
+body,
+.jp-ThemedContainer,
+.jp-WindowedPanel-outer,
+.jp-WindowedPanel-inner,
+.jp-WindowedPanel-viewport,
+.jp-NotebookPanel,
+.jp-MainAreaWidget { background: #fff !important; }
+
+/* 7. Constrain the reading measure at the real container ----------------- */
+.jp-WindowedPanel-viewport {
+  max-width: var(--book-measure) !important;
+  margin: 0 auto !important;
+  padding-top: 2.5rem !important;
+}
+.jp-Cell { max-width: none !important; }
+
+/* 8. Hide the classroom setup cell (first cell: %reload_ext postcell) ----- */
+.jp-WindowedPanel-viewport > .jp-Cell:first-child { display: none !important; }
