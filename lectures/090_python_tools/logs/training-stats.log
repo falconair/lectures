@@ -1,0 +1,14 @@
+This program is being run from the command line
+Let us find the maximum value from the following list:
+num:1, max_value:0
+max > max_value branch taken. Setting new max_value
+num:2, max_value:1
+max > max_value branch taken. Setting new max_value
+num:3, max_value:2
+max > max_value branch taken. Setting new max_value
+3
+Let us find the maximum value from another list:
+num:-1, max_value:0
+num:-2, max_value:0
+num:-3, max_value:0
+0

@@ -1,4 +1,7 @@
 Data is available from https://data.cityofchicago.org/Transportation/Taxi-Trips/wrvz-psew/
+Or
+https://www.kaggle.com/datasets/adelanseur/taxi-trips-chicago-2024?resource=download
+(Kaggle version is much smaller, about 116 meg zip file)
 
 >time zcat Taxi_Trips.csv.gz |wc -l
 113115259

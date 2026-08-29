@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 class dataProcessor:
     def __init__(self,input_file:str,    output_file:str='processed.csv'):
         self.input=input_file
-        self.output_file=output_file
+        self.output_file=output_file 
         self.data=None
     
     def Load_data(self):

@@ -1,1 +1,9 @@
-jupyter nbconvert *.ipynb --to notebook --ClearOutputPreprocessor.enabled=True --inplace
+# Remove results and remove metadata
+find . -type f -name "*.ipynb" -exec jupyter nbconvert --to notebook \
+  --ClearOutputPreprocessor.enabled=True \
+  --ClearMetadataPreprocessor.enabled=True \
+  --inplace {} +
+
+# Install this Git plugin to ignore metadata only changes
+pip install --upgrade nbstripout
+nbstripout --install

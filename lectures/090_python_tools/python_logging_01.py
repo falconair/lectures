@@ -24,9 +24,7 @@ def main():
     list_of_nums = [-1, -2, -3]
     max_value = maximum(list_of_nums)
     logging.info(max_value)
-    print("about to blow up")
-    raise ValueError("oops")
-
+    
 if __name__ == "__main__":
     logging.warning(f"This program is being run from the command line")
     main()
