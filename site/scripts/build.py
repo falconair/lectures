@@ -18,6 +18,9 @@ from pathlib import Path
 
 import yaml
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import pages  # noqa: E402
+
 REPO = Path(__file__).resolve().parents[2]
 SITE = REPO / "site"
 BUILD = SITE / "_build"          # staged contents handed to jupyter lite
@@ -188,6 +191,45 @@ def inject_css():
     return patched
 
 
+def write_book_layer(config, base_url):
+    """Landing page, per-book indexes, nav lookup and search index."""
+    books = pages.collect(config, REPO)
+
+    (OUT / "book-nav.json").write_text(json.dumps(pages.nav_json(books)))
+    (OUT / "search.json").write_text(
+        json.dumps(pages.search_index(books, REPO), ensure_ascii=False))
+
+    for asset in ("site.css", "search.js", "book-nav.js"):
+        shutil.copy2(SITE / "assets" / asset, OUT / asset)
+
+    # JupyterLite writes its own index.html at the root; ours replaces it as
+    # the front door, and its tree view stays reachable at /tree/.
+    (OUT / "index.html").write_text(pages.render_index(config, books, base="./"))
+
+    bookdir = OUT / "books"
+    bookdir.mkdir(exist_ok=True)
+    for b in books:
+        (bookdir / f"{b['id']}.html").write_text(
+            pages.render_book(config, b, base="../"))
+
+    return books
+
+
+def inject_nav(base_url):
+    """Load the chapter nav bar inside each notebook page."""
+    tag = (f'  <script>window.__BOOK_BASE__="{base_url}";</script>\n'
+           f'  <script defer src="{base_url}book-nav.js"></script>\n')
+    patched = []
+    for app in ("notebooks", "lab"):
+        shell = OUT / app / "index.html"
+        if not shell.exists() or "book-nav.js" in shell.read_text():
+            continue
+        html = shell.read_text().replace("</head>", tag + "</head>", 1)
+        shell.write_text(html)
+        patched.append(app)
+    return patched
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--skip-build", action="store_true",
@@ -207,6 +249,13 @@ def main():
         return
     build_site()
     print("patched app shells with book skin:", ", ".join(inject_css()))
+
+    base_url = config.get("base_url", "/")
+    if not base_url.endswith("/"):
+        base_url += "/"
+    books = write_book_layer(config, base_url)
+    print("patched app shells with chapter nav:", ", ".join(inject_nav(base_url)))
+    print(f"generated landing page and {len(books)} book indexes")
     print(f"\nsite built at {OUT}")
 
 

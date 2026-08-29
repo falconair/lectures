@@ -1,0 +1,102 @@
+/* Landing page and per-book tables of contents.
+   Shares the reading typography of the notebook skin so moving between the
+   book pages and a chapter does not feel like moving between two sites. */
+
+:root {
+  --ink: #1c1e21;
+  --muted: #6b7280;
+  --rule: #e6e8eb;
+  --accent: #2f6f4f;
+  --bg: #fff;
+  --panel: #fafbfc;
+  --measure: 46rem;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Charter, "Iowan Old Style", Georgia, serif;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, .num, .count, .back, input {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.site-head {
+  border-bottom: 1px solid var(--rule);
+  padding: 4rem 1.25rem 2.25rem;
+  text-align: center;
+}
+.site-head.compact { text-align: left; padding: 2.5rem 1.25rem 1.75rem; }
+.site-head h1 { margin: 0 0 .35rem; font-size: 2rem; letter-spacing: -0.02em; }
+.site-head.compact h1 { font-size: 1.6rem; }
+.byline { margin: 0; color: var(--muted); font-size: .95rem; }
+.site-head.compact .byline { max-width: var(--measure); }
+
+.back {
+  display: inline-block; margin-bottom: 1rem;
+  color: var(--accent); text-decoration: none; font-size: .85rem;
+}
+.back:hover { text-decoration: underline; }
+
+.wrap { max-width: var(--measure); margin: 0 auto; padding: 2.25rem 1.25rem 6rem; }
+
+/* the "this is a live lecture" framing note */
+.note {
+  background: var(--panel);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  padding: 1.1rem 1.25rem;
+  font-size: .95rem;
+  color: #33383d;
+  margin-bottom: 2.5rem;
+}
+
+/* book cards on the landing page */
+.cards { display: grid; gap: 1rem; }
+.card {
+  display: block; padding: 1.25rem 1.4rem;
+  border: 1px solid var(--rule); border-radius: 10px;
+  text-decoration: none; color: inherit;
+  transition: border-color .15s, transform .15s;
+}
+.card:hover { border-color: var(--accent); transform: translateY(-1px); }
+.card h2 { margin: 0 0 .4rem; font-size: 1.15rem; letter-spacing: -0.01em; }
+.card p { margin: 0 0 .6rem; color: var(--muted); font-size: .95rem; }
+.count { font-size: .78rem; color: var(--accent); letter-spacing: .02em; }
+
+/* chapter list */
+.toc { list-style: none; margin: 0; padding: 0; counter-reset: none; }
+.toc li { border-bottom: 1px solid var(--rule); }
+.toc li:first-child { border-top: 1px solid var(--rule); }
+.toc a {
+  display: flex; gap: 1rem; align-items: baseline;
+  padding: .8rem .4rem; text-decoration: none; color: inherit;
+}
+.toc a:hover { background: var(--panel); }
+.num { color: var(--muted); font-size: .8rem; min-width: 1.75rem; text-align: right; }
+.ch-title { flex: 1; }
+
+/* search */
+.search { margin-bottom: 2rem; }
+#q {
+  width: 100%; padding: .7rem .9rem; font-size: .95rem;
+  border: 1px solid var(--rule); border-radius: 8px; background: var(--panel);
+}
+#q:focus { outline: none; border-color: var(--accent); background: #fff; }
+#results { list-style: none; margin: .6rem 0 0; padding: 0; }
+#results li { border-bottom: 1px solid var(--rule); }
+#results a { display: block; padding: .6rem .3rem; text-decoration: none; color: inherit; }
+#results a:hover { background: var(--panel); }
+#results .in-book { display: block; font-size: .78rem; color: var(--muted); }
+
+@media (prefers-color-scheme: dark) {
+  :root { --ink:#e6e8ea; --muted:#9aa3ad; --rule:#2a2f36; --accent:#6fbf95; --bg:#16181c; --panel:#1c2026; }
+  .note { color: #ccd2d8; }
+  #q { color: var(--ink); }
+}
