@@ -65,6 +65,10 @@ def rewrite_image_paths(nb: dict, nb_dir_rel: str, files_base: str) -> int:
             else (m.group(4), m.group(5), m.group(6))
         if ref.startswith(("http://", "https://", "data:", "/", "attachment:", "#")):
             return m.group(0)
+        # One notebook was authored on Windows and carries `images\foo.png`.
+        # A backslash is a legal filename character on POSIX, so it survives
+        # into the URL as %5C and 404s. Normalise to a path separator.
+        ref = ref.replace("\\", "/")
         changed += 1
         return f"{prefix}{files_base}{nb_dir_rel}/{ref}{suffix}"
 

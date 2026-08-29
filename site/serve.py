@@ -9,7 +9,6 @@ DevTools > Application > Service Workers.
 import argparse
 import functools
 import http.server
-import os
 import socketserver
 from pathlib import Path
 
@@ -36,9 +35,12 @@ def main():
     if not ROOT.exists():
         raise SystemExit(f"no site at {ROOT} — run ./site/build.sh first")
 
-    os.chdir(ROOT)
+    # Resolve the directory per request rather than chdir-ing into it: the
+    # build removes and recreates _site, which would leave a chdir-ed server
+    # serving a deleted directory until restarted.
+    handler = functools.partial(Handler, directory=str(ROOT))
     socketserver.TCPServer.allow_reuse_address = True
-    with socketserver.TCPServer(("", args.port), Handler) as httpd:
+    with socketserver.TCPServer(("", args.port), handler) as httpd:
         print(f"serving {ROOT} at http://localhost:{args.port}/  (no-store; ctrl-c to stop)")
         httpd.serve_forever()
 
