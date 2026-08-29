@@ -11,7 +11,7 @@ import re
 import urllib.parse
 from pathlib import Path
 
-NOTEBOOK_URL = "notebooks/index.html?path={path}"
+NOTEBOOK_URL = "app/notebooks/index.html?path={path}"
 
 
 def notebook_url(rel: str) -> str:

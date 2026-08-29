@@ -12,6 +12,11 @@
 # "/lectures/" when publishing to GitHub Pages under the repo path.
 base_url: "/"
 
+# Restyle the notebook pages to read like book chapters (hides the Jupyter
+# menubar, toolbar and cell prompts). Off for now: get the structure right
+# first, revisit the theme afterwards.
+apply_skin: false
+
 site_title: "Lecture notes"
 author: "Shahbaz Chaudhary"
 

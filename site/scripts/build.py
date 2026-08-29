@@ -1,15 +1,24 @@
 #!/usr/bin/env python3
-"""Build the JupyterLite site for the online edition of the lecture notes.
+"""Build the online edition of the lecture notes.
+
+Layout of the generated site:
+
+    _site/                 the book: landing page, per-book indexes, search
+    _site/app/             JupyterLite, exactly as it generates itself
+
+Keeping JupyterLite entirely inside app/ means the build never edits or
+replaces a file JupyterLite owns. An earlier version put the landing page at
+the site root, which overwrote the index.html that JupyterLite reads its own
+configuration back out of, and every notebook page failed to boot.
 
 Staging mirrors the repository's directory layout inside the JupyterLite
 virtual filesystem, so notebook-relative paths like
 `../../datasets/deaths-in-gameofthrones/...` resolve unchanged and the source
-notebooks never have to be rewritten.
+notebooks are never modified.
 """
 
 import argparse
 import json
-import os
 import re
 import shutil
 import subprocess
@@ -24,34 +33,29 @@ import pages  # noqa: E402
 REPO = Path(__file__).resolve().parents[2]
 SITE = REPO / "site"
 BUILD = SITE / "_build"          # staged contents handed to jupyter lite
-OUT = SITE / "_site"             # rendered site
+OUT = SITE / "_site"             # the published site
+APP = OUT / "app"                # JupyterLite lives here, untouched
 
 # Page-weight guard, not a technical limit: Pyodide will happily read a file of
 # any size the browser can fetch. This exists so the 2.7GB taxi-trip corpus and
-# the 116MB LFS zip never end up in the published site. Raise it freely if a
-# chapter needs a bigger file — 25MB comfortably covers every dataset the books
-# currently reference.
+# the 116MB LFS zip never end up in the published site.
 MAX_DATASET_BYTES = 25 * 1024 * 1024
 
 DATASET_RE = re.compile(r'["\']([^"\']*datasets/[^"\']+)["\']')
-
-# Markdown/HTML image references: ![alt](path) and <img src="path">
 IMAGE_RE = re.compile(r'(!\[[^\]]*\]\()([^)]+)(\))|(<img[^>]+src=["\'])([^"\']+)(["\'])')
 
 
-def rewrite_image_paths(nb: dict, nb_dir_rel: str, base_url: str = "/") -> int:
+def rewrite_image_paths(nb: dict, nb_dir_rel: str, files_base: str) -> int:
     """Point relative image references at JupyterLite's /files/ endpoint.
 
     JupyterLite does not resolve relative markdown image paths against the
-    notebook's own directory. A bare `images/foo.png` is resolved against the
-    app URL (/notebooks/) and 404s; a `../files/...` path sends JupyterLab's
-    markdown renderer to the contents API, which fails and blanks the src.
-    An absolute URL is left alone and served directly.
+    notebook's own directory. A bare `images/foo.png` resolves against the app
+    URL and 404s; a `../files/...` path sends JupyterLab's markdown renderer to
+    the contents API, which fails and blanks the src entirely. Only an absolute
+    URL is left alone and served.
 
-    base_url makes the site relocatable: "/" locally, "/lectures/" when
-    published to GitHub Pages under a repository path.
-
-    Applied to the staged copy only; source notebooks are never modified.
+    Applied to the staged copy only; source notebooks keep the plain relative
+    paths that work in local Jupyter.
     """
     changed = 0
 
@@ -62,7 +66,7 @@ def rewrite_image_paths(nb: dict, nb_dir_rel: str, base_url: str = "/") -> int:
         if ref.startswith(("http://", "https://", "data:", "/", "attachment:", "#")):
             return m.group(0)
         changed += 1
-        return f"{prefix}{base_url}files/{nb_dir_rel}/{ref}{suffix}"
+        return f"{prefix}{files_base}{nb_dir_rel}/{ref}{suffix}"
 
     for cell in nb.get("cells", []):
         if cell.get("cell_type") != "markdown":
@@ -89,21 +93,16 @@ def notebook_datasets(nb_path: Path):
     for cell in nb.get("cells", []):
         if cell.get("cell_type") != "code":
             continue
-        src = "".join(cell.get("source", []))
-        for m in DATASET_RE.finditer(src):
+        for m in DATASET_RE.finditer("".join(cell.get("source", []))):
             found.add(m.group(1))
     return found
 
 
-def stage(config):
+def stage(config, files_base):
     if BUILD.exists():
         shutil.rmtree(BUILD)
     contents = BUILD / "contents"
     contents.mkdir(parents=True)
-
-    base_url = config.get("base_url", "/")
-    if not base_url.endswith("/"):
-        base_url += "/"
 
     staged_dirs = set()
     chapters = []
@@ -117,13 +116,12 @@ def stage(config):
             dst.parent.mkdir(parents=True, exist_ok=True)
 
             nb = json.loads(src.read_text())
-            image_refs += rewrite_image_paths(nb, str(Path(rel).parent), base_url)
+            image_refs += rewrite_image_paths(nb, str(Path(rel).parent), files_base)
             dst.write_text(json.dumps(nb, indent=1, ensure_ascii=False) + "\n")
 
             staged_dirs.add(src.parent)
             chapters.append((book["id"], rel, src))
 
-    # images/ directories that sit alongside the staged notebooks
     for d in staged_dirs:
         img = d / "images"
         if img.is_dir():
@@ -134,17 +132,13 @@ def stage(config):
     for d in staged_dirs:
         shutil.copy2(shim, contents / d.relative_to(REPO) / "postcell.py")
 
-    # only the datasets the staged notebooks actually reference, and only small ones
     wanted, skipped = set(), set()
     for _, rel, src in chapters:
         for ref in notebook_datasets(src):
             resolved = (src.parent / ref).resolve()
             if not resolved.exists() or not resolved.is_file():
                 continue
-            if resolved.stat().st_size > MAX_DATASET_BYTES:
-                skipped.add(resolved)
-                continue
-            wanted.add(resolved)
+            (skipped if resolved.stat().st_size > MAX_DATASET_BYTES else wanted).add(resolved)
 
     for f in wanted:
         try:
@@ -164,29 +158,35 @@ def stage(config):
     }
 
 
-def build_site():
+def build_app():
+    """Run JupyterLite into _site/app/. Nothing else writes into that tree."""
     cfg = {"LiteBuildConfig": {"contents": [str(BUILD / "contents")],
-                               "output_dir": str(OUT)}}
+                               "output_dir": str(APP)}}
     (BUILD / "jupyter_lite_config.json").write_text(json.dumps(cfg, indent=2))
     subprocess.run(["jupyter", "lite", "build"], cwd=BUILD, check=True)
 
 
-def inject_css():
-    """Link the book skin into each JupyterLite app shell."""
-    css_src = SITE / "assets" / "custom-book.css"
-    shutil.copy2(css_src, OUT / "custom-book.css")
+def inject_into_apps(base_url, apply_skin):
+    """Add the chapter nav bar (and optionally the reading skin) to app shells.
+
+    This edits JupyterLite's generated HTML in place, which is the one place we
+    have to. It only ever appends <link>/<script> tags before </head>.
+    """
+    for asset in ("book-nav.js", "book-nav.css", "custom-book.css"):
+        shutil.copy2(SITE / "assets" / asset, APP / asset)
+
+    tags = (f'  <link rel="stylesheet" href="{base_url}app/book-nav.css">\n'
+            f'  <script>window.__BOOK_BASE__="{base_url}";</script>\n'
+            f'  <script defer src="{base_url}app/book-nav.js"></script>\n')
+    if apply_skin:
+        tags = f'  <link rel="stylesheet" href="{base_url}app/custom-book.css">\n' + tags
+
     patched = []
-    for app in ("notebooks", "lab", "tree", "edit", "consoles", "repl"):
-        shell = OUT / app / "index.html"
-        if not shell.exists():
+    for app in ("notebooks", "lab"):
+        shell = APP / app / "index.html"
+        if not shell.exists() or "book-nav.js" in shell.read_text():
             continue
-        html = shell.read_text()
-        if "custom-book.css" in html:
-            continue
-        html = html.replace(
-            "</head>",
-            '  <link rel="stylesheet" href="../custom-book.css">\n</head>', 1)
-        shell.write_text(html)
+        shell.write_text(shell.read_text().replace("</head>", tags + "</head>", 1))
         patched.append(app)
     return patched
 
@@ -195,79 +195,49 @@ def write_book_layer(config, base_url):
     """Landing page, per-book indexes, nav lookup and search index."""
     books = pages.collect(config, REPO)
 
-    # JupyterLite reads its own configuration back out of the root index.html
-    # (config-utils.js getPageConfig fetches it and looks for
-    # #jupyter-config-data). Our landing page replaces that file, so the config
-    # script has to be carried across or every notebook page fails to boot.
-    root_index = OUT / "index.html"
-    m = re.search(r'<script id="jupyter-config-data".*?</script>',
-                  root_index.read_text(), re.S)
-    if not m:
-        sys.exit("ERROR: no jupyter-config-data found in the generated root "
-                 "index.html; refusing to overwrite it and break the apps")
-    config_script = m.group(0)
-
     (OUT / "book-nav.json").write_text(json.dumps(pages.nav_json(books)))
     (OUT / "search.json").write_text(
         json.dumps(pages.search_index(books, REPO), ensure_ascii=False))
-
-    for asset in ("site.css", "search.js", "book-nav.js"):
+    for asset in ("site.css", "search.js"):
         shutil.copy2(SITE / "assets" / asset, OUT / asset)
 
-    # JupyterLite writes its own index.html at the root; ours replaces it as
-    # the front door, and its tree view stays reachable at /tree/.
-    (OUT / "index.html").write_text(
-        pages.render_index(config, books, base="./", extra_head=config_script))
-
+    (OUT / "index.html").write_text(pages.render_index(config, books, base="./"))
     bookdir = OUT / "books"
     bookdir.mkdir(exist_ok=True)
     for b in books:
-        (bookdir / f"{b['id']}.html").write_text(
-            pages.render_book(config, b, base="../"))
-
+        (bookdir / f"{b['id']}.html").write_text(pages.render_book(config, b, base="../"))
     return books
-
-
-def inject_nav(base_url):
-    """Load the chapter nav bar inside each notebook page."""
-    tag = (f'  <script>window.__BOOK_BASE__="{base_url}";</script>\n'
-           f'  <script defer src="{base_url}book-nav.js"></script>\n')
-    patched = []
-    for app in ("notebooks", "lab"):
-        shell = OUT / app / "index.html"
-        if not shell.exists() or "book-nav.js" in shell.read_text():
-            continue
-        html = shell.read_text().replace("</head>", tag + "</head>", 1)
-        shell.write_text(html)
-        patched.append(app)
-    return patched
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--skip-build", action="store_true",
-                    help="stage contents only; do not run jupyter lite")
+    ap.add_argument("--skip-app", action="store_true",
+                    help="regenerate the book layer only; leave app/ alone")
     args = ap.parse_args()
 
     config = load_books()
-    stats = stage(config)
-    print(f"staged {stats['notebooks']} notebooks across {stats['dirs']} directories")
-    print(f"rewrote {stats['image_refs']} relative image references to /files/")
-    print(f"staged {stats['datasets']} dataset files")
-    if stats["datasets_skipped"]:
-        print(f"skipped {len(stats['datasets_skipped'])} oversized datasets: "
-              f"{', '.join(stats['datasets_skipped'])}")
-
-    if args.skip_build:
-        return
-    build_site()
-    print("patched app shells with book skin:", ", ".join(inject_css()))
-
     base_url = config.get("base_url", "/")
     if not base_url.endswith("/"):
         base_url += "/"
+    apply_skin = bool(config.get("apply_skin", False))
+    files_base = f"{base_url}app/files/"
+
+    if not args.skip_app:
+        if OUT.exists():
+            shutil.rmtree(OUT)
+        OUT.mkdir(parents=True)
+        stats = stage(config, files_base)
+        print(f"staged {stats['notebooks']} notebooks across {stats['dirs']} directories")
+        print(f"rewrote {stats['image_refs']} relative image references to {files_base}")
+        print(f"staged {stats['datasets']} dataset files")
+        if stats["datasets_skipped"]:
+            print(f"skipped {len(stats['datasets_skipped'])} oversized datasets: "
+                  f"{', '.join(stats['datasets_skipped'])}")
+        build_app()
+        print("patched app shells:", ", ".join(inject_into_apps(base_url, apply_skin)),
+              f"(reading skin {'ON' if apply_skin else 'OFF'})")
+
     books = write_book_layer(config, base_url)
-    print("patched app shells with chapter nav:", ", ".join(inject_nav(base_url)))
     print(f"generated landing page and {len(books)} book indexes")
     print(f"\nsite built at {OUT}")
 

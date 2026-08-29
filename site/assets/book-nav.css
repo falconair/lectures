@@ -1,0 +1,29 @@
+/* Chapter navigation bar injected into JupyterLite notebook pages.
+   Kept separate from the optional reading skin: navigation is functionality
+   and must work whether or not the Jupyter chrome is restyled. */
+
+.book-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 10000;
+  display: flex; align-items: center; gap: 1rem;
+  height: 34px; padding: 0 1rem;
+  background: #fff;
+  border-bottom: 1px solid #d8dce0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: .8rem;
+  color: #4b5563;
+}
+.book-nav a { color: #2f6f4f; text-decoration: none; }
+.book-nav a:hover { text-decoration: underline; }
+.bn-left { display: flex; align-items: center; gap: .5rem; min-width: 0; }
+.bn-book, .bn-prev, .bn-next {
+  max-width: 15rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.bn-sep { color: #9aa3ad; }
+.bn-mid { flex: 1; text-align: center; color: #6b7280; }
+.bn-right { display: flex; gap: 1rem; align-items: center; }
+
+/* push the Jupyter shell down so the bar never covers its menubar */
+body.has-book-nav #main,
+body.has-book-nav .jp-ThemedContainer,
+body.has-book-nav #jp-top-panel,
+body.has-book-nav .jp-LabShell { top: 34px !important; }

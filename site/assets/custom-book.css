@@ -100,27 +100,3 @@ body,
 
 /* 8. Hide the classroom setup cell (first cell: %reload_ext postcell) ----- */
 .jp-WindowedPanel-viewport > .jp-Cell:first-child { display: none !important; }
-
-/* 9. Chapter navigation bar (injected by book-nav.js) -------------------- */
-.book-nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-  display: flex; align-items: center; gap: 1rem;
-  padding: .55rem 1.1rem;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: saturate(180%) blur(10px);
-  border-bottom: 1px solid var(--book-rule);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-size: .82rem;
-}
-.book-nav a { color: var(--book-accent); text-decoration: none; }
-.book-nav a:hover { text-decoration: underline; }
-.bn-left { display: flex; align-items: center; gap: .5rem; min-width: 0; }
-.bn-book, .bn-prev, .bn-next {
-  max-width: 15rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.bn-sep { color: var(--book-muted); }
-.bn-mid { flex: 1; text-align: center; color: var(--book-muted); }
-.bn-right { display: flex; gap: 1rem; align-items: center; }
-
-/* make room for the fixed bar */
-.has-book-nav .jp-WindowedPanel-viewport { padding-top: 4rem !important; }
