@@ -24,3 +24,6 @@ lectures/070_scikit_learn/evidently_report.html
 
 # Rotated log files from the python-tools lecture
 lectures/090_python_tools/logs/training-stats.log.*
+
+# browser automation scratch output
+.playwright-mcp/
