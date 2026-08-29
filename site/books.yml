@@ -8,6 +8,10 @@
 # from directory numbering and notebook titles, not from how the courses were
 # actually delivered.
 
+# URL path the site is served from. "/" for local testing; set to
+# "/lectures/" when publishing to GitHub Pages under the repo path.
+base_url: "/"
+
 site_title: "Lecture notes"
 author: "Shahbaz Chaudhary"
 

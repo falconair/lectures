@@ -23,12 +23,52 @@ SITE = REPO / "site"
 BUILD = SITE / "_build"          # staged contents handed to jupyter lite
 OUT = SITE / "_site"             # rendered site
 
-# Datasets above this size are assumed to be class-time downloads, not things
-# a reader should pull over the wire. The taxi-trip corpus (2.7GB) is the
-# reason this limit exists.
-MAX_DATASET_BYTES = 5 * 1024 * 1024
+# Page-weight guard, not a technical limit: Pyodide will happily read a file of
+# any size the browser can fetch. This exists so the 2.7GB taxi-trip corpus and
+# the 116MB LFS zip never end up in the published site. Raise it freely if a
+# chapter needs a bigger file — 25MB comfortably covers every dataset the books
+# currently reference.
+MAX_DATASET_BYTES = 25 * 1024 * 1024
 
 DATASET_RE = re.compile(r'["\']([^"\']*datasets/[^"\']+)["\']')
+
+# Markdown/HTML image references: ![alt](path) and <img src="path">
+IMAGE_RE = re.compile(r'(!\[[^\]]*\]\()([^)]+)(\))|(<img[^>]+src=["\'])([^"\']+)(["\'])')
+
+
+def rewrite_image_paths(nb: dict, nb_dir_rel: str, base_url: str = "/") -> int:
+    """Point relative image references at JupyterLite's /files/ endpoint.
+
+    JupyterLite does not resolve relative markdown image paths against the
+    notebook's own directory. A bare `images/foo.png` is resolved against the
+    app URL (/notebooks/) and 404s; a `../files/...` path sends JupyterLab's
+    markdown renderer to the contents API, which fails and blanks the src.
+    An absolute URL is left alone and served directly.
+
+    base_url makes the site relocatable: "/" locally, "/lectures/" when
+    published to GitHub Pages under a repository path.
+
+    Applied to the staged copy only; source notebooks are never modified.
+    """
+    changed = 0
+
+    def sub(m):
+        nonlocal changed
+        prefix, ref, suffix = (m.group(1), m.group(2), m.group(3)) if m.group(1) \
+            else (m.group(4), m.group(5), m.group(6))
+        if ref.startswith(("http://", "https://", "data:", "/", "attachment:", "#")):
+            return m.group(0)
+        changed += 1
+        return f"{prefix}{base_url}files/{nb_dir_rel}/{ref}{suffix}"
+
+    for cell in nb.get("cells", []):
+        if cell.get("cell_type") != "markdown":
+            continue
+        src = "".join(cell.get("source", []))
+        new = IMAGE_RE.sub(sub, src)
+        if new != src:
+            cell["source"] = new.splitlines(keepends=True)
+    return changed
 
 
 def load_books():
@@ -58,8 +98,13 @@ def stage(config):
     contents = BUILD / "contents"
     contents.mkdir(parents=True)
 
+    base_url = config.get("base_url", "/")
+    if not base_url.endswith("/"):
+        base_url += "/"
+
     staged_dirs = set()
     chapters = []
+    image_refs = 0
     for book in config["books"]:
         for rel in book["chapters"]:
             src = REPO / rel
@@ -67,7 +112,11 @@ def stage(config):
                 sys.exit(f"ERROR: {book['id']} lists a missing notebook: {rel}")
             dst = contents / rel
             dst.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(src, dst)
+
+            nb = json.loads(src.read_text())
+            image_refs += rewrite_image_paths(nb, str(Path(rel).parent), base_url)
+            dst.write_text(json.dumps(nb, indent=1, ensure_ascii=False) + "\n")
+
             staged_dirs.add(src.parent)
             chapters.append((book["id"], rel, src))
 
@@ -105,6 +154,7 @@ def stage(config):
 
     return {
         "notebooks": len(chapters),
+        "image_refs": image_refs,
         "dirs": len(staged_dirs),
         "datasets": len(wanted),
         "datasets_skipped": sorted(p.name for p in skipped),
@@ -147,6 +197,7 @@ def main():
     config = load_books()
     stats = stage(config)
     print(f"staged {stats['notebooks']} notebooks across {stats['dirs']} directories")
+    print(f"rewrote {stats['image_refs']} relative image references to /files/")
     print(f"staged {stats['datasets']} dataset files")
     if stats["datasets_skipped"]:
         print(f"skipped {len(stats['datasets_skipped'])} oversized datasets: "
