@@ -57,9 +57,19 @@
 .bn-side {
   position: fixed; top: var(--booknav-h); bottom: 0; z-index: 10000;
   overflow-y: auto; overscroll-behavior: contain;
+  /* A rail longer than the window scrolls, which is correct, but its
+     scrollbar should not compete with the notebook's — three panes with three
+     equally loud scrollbars reads as something misbehaving. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule, #e2ddcd) transparent;
   background: var(--bg, #fffff8);
   font-family: var(--sans, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
   padding: 1.4rem 0 3rem;
+}
+.bn-side::-webkit-scrollbar { width: 6px; }
+.bn-side::-webkit-scrollbar-track { background: transparent; }
+.bn-side::-webkit-scrollbar-thumb {
+  background: var(--rule, #e2ddcd); border-radius: 3px;
 }
 .bn-side-left  { left: 0;  width: var(--bn-left-w);  border-right: 1px solid var(--rule, #e2ddcd); }
 .bn-side-right { right: 0; width: var(--bn-right-w); border-left: 1px solid var(--rule, #e2ddcd); }

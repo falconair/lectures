@@ -193,7 +193,14 @@
         ol.appendChild(li);
         return { h: h, a: a };
       });
-      var empty = entries.length === 0;
+      /* "No entries" means two different things: this chapter genuinely has
+         no subheadings, or its markdown has not rendered yet. Only the first
+         should collapse the rail. Treating them alike hid the rail — and
+         released its width — for the first few seconds of every load, then
+         reflowed the notebook when it reappeared. */
+      var renderedMarkdown = document.querySelectorAll(
+        ".jp-MarkdownCell .jp-RenderedHTMLCommon").length;
+      var empty = entries.length === 0 && renderedMarkdown > 0;
       if (document.body.classList.contains("bn-empty-right") !== empty) {
         document.body.classList.toggle("bn-empty-right", empty);
         reflow();

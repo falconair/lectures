@@ -39,6 +39,11 @@ body {
 }
 
 /* 2. Page ground -------------------------------------------------------- */
+/* html included deliberately. body's background normally propagates to the
+   canvas, but body here is a zero-height Lumino container whose children are
+   all absolutely positioned, so any region no widget covers falls through to
+   the browser's default white. */
+html,
 body,
 .jp-ThemedContainer,
 .jp-NotebookPanel,
@@ -65,6 +70,16 @@ body,
 .lm-MenuBar-item.lm-mod-active {
   background: var(--bg-soft) !important;
   color: var(--ink) !important;
+}
+/* Notebook 7 gives #menu-panel a max-width and auto side margins so the menu
+   lines up with its own 1200px content column. Our column is narrower and
+   centred differently, so on a wide screen the effect is File/Edit floating
+   ~170px right of the toolbar icons directly beneath them. Align the menu with
+   the rest of the chrome instead. */
+#menu-panel {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  max-width: none !important;
 }
 
 .jp-NotebookPanel-toolbar,
