@@ -82,6 +82,52 @@ def rewrite_image_paths(nb: dict, nb_dir_rel: str, files_base: str) -> int:
     return changed
 
 
+SETUP_PREFIXES = ("%reload_ext postcell", "%load_ext postcell", "%postcell ")
+POSTCELL_MAGIC = re.compile(r"^\s*%%postcell\b.*\n?", re.M)
+
+
+def strip_postcell(nb: dict) -> tuple:
+    """Remove the classroom postcell scaffolding from the staged copy.
+
+    `site/shim/postcell.py` replaces the real magic with a pass-through: for
+    `%%postcell <id>`, its whole body is `self.shell.run_cell(cell)`. So a cell
+    magic line is semantically a no-op, and deleting the line leaves an
+    ordinary code cell that behaves identically.
+
+    That means the scaffolding can be removed outright rather than hidden:
+
+    - cells whose entire content is setup (`%reload_ext postcell`,
+      `%postcell register`) are dropped, and
+    - the leading `%%postcell <id>` line is stripped from exercise cells.
+
+    Hiding was tried first and does not work. Marking the setup cell
+    `jupyter.source_hidden` is honoured by JupyterLab only when it saves
+    collapse state, not when rendering a freshly loaded notebook, so the cell
+    came back visible. Hiding it in CSS is impossible: a stylesheet cannot tell
+    a setup cell from a chapter title, and matching on position blanked the
+    first cell of 57 of the 81 chapters.
+
+    Applied to the staged copy only; source notebooks keep their scaffolding.
+    """
+    kept, dropped, stripped = [], 0, 0
+    for cell in nb.get("cells", []):
+        if cell.get("cell_type") != "code":
+            kept.append(cell)
+            continue
+        src = "".join(cell.get("source", []))
+        lines = [ln.strip() for ln in src.splitlines() if ln.strip()]
+        if lines and all(ln.startswith(SETUP_PREFIXES) for ln in lines):
+            dropped += 1
+            continue
+        new_src, n = POSTCELL_MAGIC.subn("", src)
+        if n:
+            stripped += n
+            cell["source"] = new_src.splitlines(keepends=True)
+        kept.append(cell)
+    nb["cells"] = kept
+    return dropped, stripped
+
+
 def load_books():
     with open(SITE / "books.yml") as fh:
         return yaml.safe_load(fh)
@@ -111,6 +157,8 @@ def stage(config, files_base):
     staged_dirs = set()
     chapters = []
     image_refs = 0
+    setup_cells = 0
+    magic_lines = 0
     for book in config["books"]:
         for rel in book["chapters"]:
             src = REPO / rel
@@ -121,6 +169,9 @@ def stage(config, files_base):
 
             nb = json.loads(src.read_text())
             image_refs += rewrite_image_paths(nb, str(Path(rel).parent), files_base)
+            d, st = strip_postcell(nb)
+            setup_cells += d
+            magic_lines += st
             dst.write_text(json.dumps(nb, indent=1, ensure_ascii=False) + "\n")
 
             staged_dirs.add(src.parent)
@@ -157,6 +208,8 @@ def stage(config, files_base):
         "notebooks": len(chapters),
         "image_refs": image_refs,
         "dirs": len(staged_dirs),
+        "setup_cells": setup_cells,
+        "magic_lines": magic_lines,
         "datasets": len(wanted),
         "datasets_skipped": sorted(p.name for p in skipped),
     }
@@ -176,14 +229,22 @@ def inject_into_apps(base_url, apply_skin):
     This edits JupyterLite's generated HTML in place, which is the one place we
     have to. It only ever appends <link>/<script> tags before </head>.
     """
-    for asset in ("book-nav.js", "book-nav.css", "custom-book.css"):
+    for asset in ("book-nav.js", "book-nav.css", "custom-book.css", "tokens.css"):
         shutil.copy2(SITE / "assets" / asset, APP / asset)
+    # tokens.css references its fonts relatively, so they must sit beside it
+    shutil.copytree(SITE / "assets" / "fonts", APP / "fonts", dirs_exist_ok=True)
 
-    tags = (f'  <link rel="stylesheet" href="{base_url}app/book-nav.css">\n'
-            f'  <script>window.__BOOK_BASE__="{base_url}";</script>\n'
-            f'  <script defer src="{base_url}app/book-nav.js"></script>\n')
+    # tokens.css defines the custom properties the other two read; it has to
+    # come first or they resolve against nothing.
+    sheets = ["tokens.css"]
     if apply_skin:
-        tags = f'  <link rel="stylesheet" href="{base_url}app/custom-book.css">\n' + tags
+        sheets.append("custom-book.css")
+    sheets.append("book-nav.css")
+
+    tags = "".join(f'  <link rel="stylesheet" href="{base_url}app/{s}">\n'
+                   for s in sheets)
+    tags += (f'  <script>window.__BOOK_BASE__="{base_url}";</script>\n'
+             f'  <script defer src="{base_url}app/book-nav.js"></script>\n')
 
     patched = []
     for app in ("notebooks", "lab"):
@@ -202,8 +263,9 @@ def write_book_layer(config, base_url):
     (OUT / "book-nav.json").write_text(json.dumps(pages.nav_json(books)))
     (OUT / "search.json").write_text(
         json.dumps(pages.search_index(books, REPO), ensure_ascii=False))
-    for asset in ("site.css", "search.js"):
+    for asset in ("site.css", "search.js", "tokens.css"):
         shutil.copy2(SITE / "assets" / asset, OUT / asset)
+    shutil.copytree(SITE / "assets" / "fonts", OUT / "fonts", dirs_exist_ok=True)
 
     (OUT / "index.html").write_text(pages.render_index(config, books, base="./"))
     bookdir = OUT / "books"
@@ -233,6 +295,8 @@ def main():
         stats = stage(config, files_base)
         print(f"staged {stats['notebooks']} notebooks across {stats['dirs']} directories")
         print(f"rewrote {stats['image_refs']} relative image references to {files_base}")
+        print(f"removed {stats['setup_cells']} postcell setup cells and "
+              f"{stats['magic_lines']} %%postcell magic lines")
         print(f"staged {stats['datasets']} dataset files")
         if stats["datasets_skipped"]:
             print(f"skipped {len(stats['datasets_skipped'])} oversized datasets: "

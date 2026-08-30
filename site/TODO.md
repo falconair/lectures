@@ -39,17 +39,34 @@ the two R notebooks, the untitled bytecode notebook, a TODO-marked one, and the
 
 ## Deferred by choice
 
-### 4. The reading skin
-`apply_skin: false` in `site/books.yml`. Setting it to `true` hides the Jupyter
-menubar, toolbar and cell prompts and re-typesets chapters as a reading column
-(`site/assets/custom-book.css`). Parked until the structure settles.
+### 4. Cell affordances and shortcut teaching
+The reading skin is **on** (`apply_skin: true`). It restyles the Jupyter
+menubar and toolbar rather than hiding them, so every affordance — Run, Insert
+Cell, Restart, every keyboard shortcut — keeps working. That retires the old
+"No Run button" blocker. Dark mode is also settled: `site/assets/tokens.css`
+carries a warm paper light and a warm dark, shared by the book pages and the
+chapter skin, so the two can no longer drift.
 
-Two things to resolve before turning it on:
+What was deliberately deferred, in rough priority order:
 
-- **No Run button.** The skin hides Jupyter's toolbar, so readers would need
-  Shift+Enter with nothing telling them so. Needs a per-cell run affordance.
-- **Dark mode is half-done.** The landing and book pages have a dark palette;
-  the notebook skin does not. Switching between them in dark mode will jar.
+- **A per-cell run control.** The gutter currently shows Jupyter's execution
+  count (`[4]`) as margin notation — it marks a cell as executable and records
+  what ran, but is not itself a button. Making it hover-to-run needs
+  `window.jupyterapp`, which requires `exposeAppInBrowser: true` in the
+  JupyterLite page config. That is a documented option in the shipped schema
+  (`app/jupyterlite.schema.v0.json`), not a private internal. The command is
+  `notebook:run-cell-and-select-next`.
+- **An insert-cell affordance.** A hairline with a ⊕ appearing between cells on
+  hover, for a student who wants somewhere to experiment without reaching for
+  the menu. `notebook:insert-cell-below`. Same prerequisite.
+- **Tooltips that teach shortcuts.** Jupyter's own toolbar tooltips read
+  "Run this cell and advance" and never name the key. `app.commands.keyBindings`
+  holds the real binding for every command, so tooltips can be generated from
+  what is actually bound rather than hardcoded — they cannot drift out of date.
+
+Useful fact for all three: `windowingMode` defaults to `contentVisibility` in
+this build, not `full`, so cell DOM stays in the document while scrolling.
+Per-cell injection does not have to survive node recycling.
 
 ### 5. Publish to GitHub Pages
 Set `base_url: "/lectures/"` in `site/books.yml`, then a workflow that builds
@@ -112,6 +129,11 @@ Resizing the images is the easy win. `MAX_DATASET_BYTES` in
 
 ## Smaller items
 
+- **The code measure is wider than the prose measure.** Prose sits at 34rem,
+  code breaks out to 42rem (`--measure` / `--measure-code` in
+  `site/assets/tokens.css`). At 34rem, 12.4% of the code lines in these
+  lectures overflow into a horizontal scroll; at 42rem, 6.7%. Set the two
+  equal for a single uniform column.
 - **Search is substring-only** over titles and the first 400 words of prose
   (`site/scripts/pages.py`). No stemming, no ranking beyond title-before-body.
 - **Chapter titles come from the first markdown heading.** Two notebooks have
@@ -122,6 +144,29 @@ Resizing the images is the easy win. `MAX_DATASET_BYTES` in
   confirmation.
 - **`datasets/market_data/.gitattributes`** contains a `../` LFS rule that
   matches nothing. Dead file, safe to delete.
+- **Three chapters read `postcell.conf`, which is not staged.**
+  `245-functions-decorators`, `280-exceptions` and `290-context_managers` use
+  `open('../../postcell.conf')` as a file-handling example. The build only
+  stages files matched by the `datasets/` regex, so both `postcell.conf` and
+  `postcell.conf.bak` 404 in the browser and those cells raise
+  `FileNotFoundError`. Deliberate in `280-exceptions`, which is teaching
+  exceptions; broken in the other two. Either stage the two files or point the
+  examples at something that ships. Belongs with item 7.
+- **Leaving a chapter prompts "Leave site?"** JupyterLab registers a
+  `beforeunload` handler and JupyterLite marks a notebook dirty on load, so the
+  nav bar's prev/next links raise a browser confirmation before every chapter
+  change — hit repeatedly while testing. Prev/next is the primary way through a
+  book, so this is worth solving before publishing.
+- **Markdown cells show light-mode syntax colours while being edited, in dark
+  mode.** Python code is themed correctly through `--jp-mirror-editor-*`, but
+  CodeMirror themes markdown source separately and those variables do not reach
+  it, so double-clicking a markdown cell in dark mode shows dark blue on near
+  black. Only affects editing prose, not reading.
+- **The postcell shim is now unused by the published site.**
+  `site/scripts/build.py` strips every `%%postcell` magic and setup cell from
+  the staged copies, so `site/shim/postcell.py` is still copied into 28
+  directories but nothing imports it. Safe to stop copying; left in place as a
+  net for any form the matcher misses.
 - **Stale service workers.** Anyone who loaded a pre-`app/` build has a worker
   registered at the site root serving cached pages. Clear with the snippet in
   the commit log, or DevTools → Application → Service Workers → Unregister.

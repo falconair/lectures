@@ -5,11 +5,16 @@ Sends Cache-Control: no-store so edits show up on reload without fighting the
 browser cache. Note this cannot override JupyterLite's service worker, which
 is scoped to /app/ — if app assets look stale, tick "Bypass for network" under
 DevTools > Application > Service Workers.
+
+Threaded on purpose. The single-threaded socketserver.TCPServer this used to
+build handles one connection at a time, so a single browser holding a
+keep-alive socket open wedges the server for every other client — a second tab,
+or a second browser, would hang indefinitely on a request that never gets
+served.
 """
 import argparse
 import functools
 import http.server
-import socketserver
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent / "_site"
@@ -39,8 +44,8 @@ def main():
     # build removes and recreates _site, which would leave a chdir-ed server
     # serving a deleted directory until restarted.
     handler = functools.partial(Handler, directory=str(ROOT))
-    socketserver.TCPServer.allow_reuse_address = True
-    with socketserver.TCPServer(("", args.port), handler) as httpd:
+    http.server.ThreadingHTTPServer.allow_reuse_address = True
+    with http.server.ThreadingHTTPServer(("", args.port), handler) as httpd:
         print(f"serving {ROOT} at http://localhost:{args.port}/  (no-store; ctrl-c to stop)")
         httpd.serve_forever()
 

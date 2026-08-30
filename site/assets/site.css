@@ -1,16 +1,9 @@
 /* Landing page and per-book tables of contents.
-   Shares the reading typography of the notebook skin so moving between the
-   book pages and a chapter does not feel like moving between two sites. */
-
-:root {
-  --ink: #1c1e21;
-  --muted: #6b7280;
-  --rule: #e6e8eb;
-  --accent: #2f6f4f;
-  --bg: #fff;
-  --panel: #fafbfc;
-  --measure: 46rem;
-}
+ *
+ * Shares tokens.css with the chapter skin, so moving from a book index into a
+ * notebook does not feel like moving between two sites. Everything here reads
+ * its palette and type from that file; define no colours locally.
+ */
 
 * { box-sizing: border-box; }
 
@@ -18,85 +11,144 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: Charter, "Iowan Old Style", Georgia, serif;
+  font-family: var(--serif);
+  font-size: 1.125rem;
   line-height: 1.65;
+  font-optical-sizing: auto;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-h1, h2, .num, .count, .back, input {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
+.wrap { max-width: calc(var(--measure) + 4rem); margin: 0 auto; padding: 2.5rem 1.25rem 7rem; }
 
+/* Masthead -------------------------------------------------------------- */
 .site-head {
   border-bottom: 1px solid var(--rule);
-  padding: 4rem 1.25rem 2.25rem;
+  padding: 5rem 1.25rem 2.5rem;
   text-align: center;
 }
-.site-head.compact { text-align: left; padding: 2.5rem 1.25rem 1.75rem; }
-.site-head h1 { margin: 0 0 .35rem; font-size: 2rem; letter-spacing: -0.02em; }
-.site-head.compact h1 { font-size: 1.6rem; }
-.byline { margin: 0; color: var(--muted); font-size: .95rem; }
-.site-head.compact .byline { max-width: var(--measure); }
+.site-head.compact {
+  text-align: left;
+  padding: 2.5rem 1.25rem 1.75rem;
+  max-width: calc(var(--measure) + 4rem);
+  margin: 0 auto;
+  /* No rule here. The header's border spans its own padding box, which is
+     1.25rem wider on each side than the rules inside .wrap below it, so the
+     two read as a mismatched double line. The note's top rule already
+     separates the header from the body. */
+  border-bottom: none;
+}
+.site-head h1 {
+  margin: 0 0 .3rem;
+  font-weight: 400;
+  font-size: 2.6rem;
+  letter-spacing: -.012em;
+  line-height: 1.1;
+}
+.site-head.compact h1 { font-size: 1.9rem; }
+.byline { margin: 0; color: var(--muted); font-size: .95rem; font-style: italic; }
 
 .back {
-  display: inline-block; margin-bottom: 1rem;
-  color: var(--accent); text-decoration: none; font-size: .85rem;
+  display: inline-block;
+  margin-bottom: 1.1rem;
+  color: var(--muted);
+  text-decoration: none;
+  font-family: var(--sans);
+  font-size: .68rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
 }
-.back:hover { text-decoration: underline; }
+.back:hover { color: var(--accent); }
 
-.wrap { max-width: var(--measure); margin: 0 auto; padding: 2.25rem 1.25rem 6rem; }
-
-/* the "this is a live lecture" framing note */
+/* The "these are live lecture notes" framing note ------------------------ */
 .note {
-  background: var(--panel);
-  border-left: 3px solid var(--accent);
-  border-radius: 0 8px 8px 0;
-  padding: 1.1rem 1.25rem;
-  font-size: .95rem;
-  color: #33383d;
-  margin-bottom: 2.5rem;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  padding: 1.3rem 0;
+  font-size: .97rem;
+  color: var(--muted);
+  margin-bottom: 3rem;
 }
+.note strong { color: var(--ink); font-weight: 600; }
 
-/* book cards on the landing page */
-.cards { display: grid; gap: 1rem; }
+/* Book cards ------------------------------------------------------------ */
+.cards { display: grid; gap: 0; }
 .card {
-  display: block; padding: 1.25rem 1.4rem;
-  border: 1px solid var(--rule); border-radius: 10px;
-  text-decoration: none; color: inherit;
-  transition: border-color .15s, transform .15s;
+  display: block;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--rule);
+  text-decoration: none;
+  color: inherit;
+  transition: background .12s ease;
 }
-.card:hover { border-color: var(--accent); transform: translateY(-1px); }
-.card h2 { margin: 0 0 .4rem; font-size: 1.15rem; letter-spacing: -0.01em; }
-.card p { margin: 0 0 .6rem; color: var(--muted); font-size: .95rem; }
-.count { font-size: .78rem; color: var(--accent); letter-spacing: .02em; }
+.cards .card:first-child { border-top: 1px solid var(--rule); }
+.card:hover { background: var(--bg-soft); }
+.card h2 {
+  margin: 0 0 .35rem;
+  font-weight: 600;
+  font-size: 1.3rem;
+  letter-spacing: -.008em;
+}
+.card:hover h2 { color: var(--accent); }
+.card p { margin: 0 0 .55rem; color: var(--muted); font-size: .97rem; }
+.count {
+  font-family: var(--sans);
+  font-size: .66rem;
+  color: var(--muted);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
 
-/* chapter list */
-.toc { list-style: none; margin: 0; padding: 0; counter-reset: none; }
-.toc li { border-bottom: 1px solid var(--rule); }
+/* Chapter list ---------------------------------------------------------- */
+.toc { list-style: none; margin: 0; padding: 0; }
+.toc li { border-bottom: 1px solid var(--rule-soft); }
 .toc li:first-child { border-top: 1px solid var(--rule); }
 .toc a {
-  display: flex; gap: 1rem; align-items: baseline;
-  padding: .8rem .4rem; text-decoration: none; color: inherit;
+  display: flex; gap: 1.1rem; align-items: baseline;
+  padding: .75rem .3rem;
+  text-decoration: none; color: inherit;
+  transition: background .12s ease;
 }
-.toc a:hover { background: var(--panel); }
-.num { color: var(--muted); font-size: .8rem; min-width: 1.75rem; text-align: right; }
+.toc a:hover { background: var(--bg-soft); }
+.toc a:hover .ch-title { color: var(--accent); }
+.num {
+  font-family: var(--mono);
+  color: var(--muted);
+  font-size: .72rem;
+  min-width: 1.9rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
 .ch-title { flex: 1; }
 
-/* search */
-.search { margin-bottom: 2rem; }
+/* Search ---------------------------------------------------------------- */
+.search { margin-bottom: 2.5rem; }
 #q {
-  width: 100%; padding: .7rem .9rem; font-size: .95rem;
-  border: 1px solid var(--rule); border-radius: 8px; background: var(--panel);
+  width: 100%;
+  padding: .7rem .2rem;
+  font-family: var(--serif);
+  font-size: 1rem;
+  color: var(--ink);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--rule);
 }
-#q:focus { outline: none; border-color: var(--accent); background: #fff; }
-#results { list-style: none; margin: .6rem 0 0; padding: 0; }
-#results li { border-bottom: 1px solid var(--rule); }
+#q::placeholder { color: var(--muted); font-style: italic; }
+#q:focus { outline: none; border-bottom-color: var(--accent); }
+#results { list-style: none; margin: .5rem 0 0; padding: 0; }
+#results li { border-bottom: 1px solid var(--rule-soft); }
 #results a { display: block; padding: .6rem .3rem; text-decoration: none; color: inherit; }
-#results a:hover { background: var(--panel); }
-#results .in-book { display: block; font-size: .78rem; color: var(--muted); }
+#results a:hover { background: var(--bg-soft); color: var(--accent); }
+#results .in-book {
+  display: block;
+  font-family: var(--sans);
+  font-size: .66rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
 
-@media (prefers-color-scheme: dark) {
-  :root { --ink:#e6e8ea; --muted:#9aa3ad; --rule:#2a2f36; --accent:#6fbf95; --bg:#16181c; --panel:#1c2026; }
-  .note { color: #ccd2d8; }
-  #q { color: var(--ink); }
+@media (max-width: 640px) {
+  .site-head { padding: 3rem 1.1rem 2rem; }
+  .site-head h1 { font-size: 2rem; }
 }

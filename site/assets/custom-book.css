@@ -1,102 +1,316 @@
-/* ---- JupyterLite "static book" skin -------------------------------------
-   Strips IDE chrome and re-typesets the notebook as a reading column.
-   Code cells stay live and editable; only the furniture is hidden.        */
+/* JupyterLite chapter skin.
+ *
+ * Re-typesets a notebook as a book chapter WITHOUT removing anything. An
+ * earlier version of this file hid the menubar and toolbar outright, which
+ * left a reader with no visible way to run a cell (see TODO.md item 4). The
+ * rule here is the opposite: every Jupyter affordance keeps working and stays
+ * reachable — menus, toolbar, cell insertion, keyboard shortcuts — the
+ * furniture is only made quiet enough to read past.
+ *
+ * Requires tokens.css, loaded ahead of it.
+ */
 
-:root {
-  --book-measure: 46rem;
-  --book-ink: #1c1e21;
-  --book-muted: #6b7280;
-  --book-rule: #e6e8eb;
-  --book-code-bg: #f7f8fa;
-  --book-accent: #2f6f4f;
+/* 1. Hand Jupyter's own theme variables our palette --------------------- */
+/* JupyterLab's CodeMirror 6 theme reads these; overriding them retints
+   syntax highlighting without touching CM6's generated class names, which
+   are not stable enough to target from outside. */
+body {
+  --jp-layout-color0: var(--bg);
+  --jp-layout-color1: var(--bg);
+  --jp-layout-color2: var(--bg-soft);
+  --jp-content-font-color0: var(--ink);
+  --jp-content-font-color1: var(--ink);
+  --jp-ui-font-color1: var(--muted);
+  --jp-border-color1: var(--rule);
+  --jp-border-color2: var(--rule-soft);
+  --jp-cell-prompt-width: var(--gutter);
+  --jp-cell-editor-background: transparent;
+  --jp-cell-editor-border-color: transparent;
+  --jp-brand-color1: var(--accent);
+
+  --jp-mirror-editor-keyword-color:  var(--syn-keyword);
+  --jp-mirror-editor-string-color:   var(--syn-string);
+  --jp-mirror-editor-comment-color:  var(--syn-comment);
+  --jp-mirror-editor-number-color:   var(--syn-number);
+  --jp-mirror-editor-def-color:      var(--syn-def);
+  --jp-mirror-editor-builtin-color:  var(--syn-builtin);
+  --jp-mirror-editor-operator-color: var(--syn-operator);
+  --jp-mirror-editor-variable-color: var(--ink-soft);
 }
 
-/* 1. Hide the IDE furniture ---------------------------------------------- */
-#menu-panel-wrapper,
-#top-panel-wrapper,
-#top-panel,
-.jp-MenuBar,
-.jp-NotebookPanel-toolbar,
-.jp-Toolbar,
-.jp-Cell-toolbar,
-.jp-InputPrompt,
-.jp-OutputPrompt,
-#jp-bottom-panel,
-.jp-StatusBar,
-.jp-WindowedPanel-scrollbar { display: none !important; }
-
-/* 2. Reading column ------------------------------------------------------ */
-.jp-Notebook {
-  background: #fff !important;
-  padding: 3.5rem 1.25rem 6rem !important;
-}
-.jp-Notebook > .jp-Cell,
-.jp-WindowedPanel-inner > .jp-Cell {
-  max-width: var(--book-measure);
-  margin: 0 auto !important;
-  padding: 0.35rem 0 !important;
-  border: none !important;
-  background: transparent !important;
-}
-
-/* kill the active-cell blue bar and focus boxes */
-.jp-Cell.jp-mod-active .jp-InputArea-editor,
-.jp-Cell .jp-InputArea-editor { border: none !important; box-shadow: none !important; }
-.jp-Collapser, .jp-CellHeader, .jp-CellFooter { display: none !important; }
-
-/* 3. Prose --------------------------------------------------------------- */
-.jp-MarkdownOutput, .jp-RenderedHTMLCommon {
-  font-family: Charter, "Iowan Old Style", Georgia, serif !important;
-  font-size: 1.0625rem !important;
-  line-height: 1.7 !important;
-  color: var(--book-ink) !important;
-}
-.jp-RenderedHTMLCommon h1,
-.jp-RenderedHTMLCommon h2,
-.jp-RenderedHTMLCommon h3 {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
-  letter-spacing: -0.015em;
-  margin-top: 2.25rem !important;
-}
-.jp-RenderedHTMLCommon h1 { font-size: 1.9rem !important; }
-.jp-RenderedHTMLCommon h2 { font-size: 1.45rem !important; }
-.jp-RenderedHTMLCommon img { border-radius: 6px; }
-
-/* 4. Code as a styled block, not an IDE cell ----------------------------- */
-.jp-CodeCell .jp-InputArea-editor {
-  background: var(--book-code-bg) !important;
-  border-radius: 8px !important;
-  border-left: 3px solid var(--book-accent) !important;
-  padding: 0.65rem 0.85rem !important;
-}
-.jp-CodeCell .cm-editor { background: transparent !important; }
-.cm-content, .cm-line { font-size: 0.9rem !important; line-height: 1.55 !important; }
-
-/* 5. Outputs read as results, not console dumps -------------------------- */
-.jp-OutputArea-output {
-  background: transparent !important;
-  padding: 0.3rem 0 0.3rem 0.85rem !important;
-  border-left: 2px solid var(--book-rule) !important;
-  font-size: 0.9rem !important;
-}
-.jp-OutputArea-output pre { color: var(--book-muted) !important; }
-
-/* 6. Page ground: kill the IDE greys at every layer ---------------------- */
+/* 2. Page ground -------------------------------------------------------- */
 body,
 .jp-ThemedContainer,
+.jp-NotebookPanel,
+.jp-MainAreaWidget,
 .jp-WindowedPanel-outer,
 .jp-WindowedPanel-inner,
 .jp-WindowedPanel-viewport,
-.jp-NotebookPanel,
-.jp-MainAreaWidget { background: #fff !important; }
+.jp-Notebook { background: var(--bg) !important; color: var(--ink); }
 
-/* 7. Constrain the reading measure at the real container ----------------- */
-.jp-WindowedPanel-viewport {
-  max-width: var(--book-measure) !important;
-  margin: 0 auto !important;
-  padding-top: 2.5rem !important;
+/* 3. Quiet the furniture — restyled, never removed ---------------------- */
+.lm-MenuBar,
+#jp-menu-panel,
+#menu-panel-wrapper {
+  background: var(--bg) !important;
+  border-bottom: 1px solid var(--rule-soft) !important;
+  box-shadow: none !important;
 }
-.jp-Cell { max-width: none !important; }
+.lm-MenuBar-item {
+  font-family: var(--sans) !important;
+  font-size: .78rem !important;
+  color: var(--muted) !important;
+  padding: .25rem .6rem !important;
+}
+.lm-MenuBar-item.lm-mod-active {
+  background: var(--bg-soft) !important;
+  color: var(--ink) !important;
+}
 
-/* 8. Hide the classroom setup cell (first cell: %reload_ext postcell) ----- */
-.jp-WindowedPanel-viewport > .jp-Cell:first-child { display: none !important; }
+.jp-NotebookPanel-toolbar,
+.jp-Toolbar {
+  background: var(--bg) !important;
+  border-bottom: 1px solid var(--rule-soft) !important;
+  box-shadow: none !important;
+  min-height: 2rem !important;
+  padding: .1rem .5rem !important;
+}
+.jp-Toolbar-item .jp-ToolbarButtonComponent {
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  color: var(--muted) !important;
+}
+.jp-Toolbar-item .jp-ToolbarButtonComponent:hover {
+  background: var(--bg-soft) !important;
+  border-color: var(--rule) !important;
+}
+.jp-ToolbarButtonComponent .jp-icon3[fill],
+.jp-Toolbar svg [fill='#616161'] { fill: var(--muted) !important; }
+.jp-Toolbar select,
+.jp-Notebook-toolbarCellTypeDropdown select {
+  font-family: var(--sans) !important;
+  font-size: .75rem !important;
+  color: var(--muted) !important;
+  background: var(--bg) !important;
+  border: 1px solid var(--rule) !important;
+  border-radius: 4px !important;
+}
+
+/* Jupyter's own top bar repeats the filename and adds "Last Checkpoint: 1
+   hour ago", which is meaningless for a reader and duplicates the nav bar.
+   #jp-skiplink lives in the same panel and is deliberately left alone — it is
+   the keyboard skip-to-content link. */
+#jp-top-bar { display: none !important; }
+/* trust state is IDE bookkeeping; a reader can do nothing with it */
+.jp-NotebookTrustedStatus { display: none !important; }
+/* the caret that folds a markdown heading's section */
+.jp-collapseHeadingButton { display: none !important; }
+#top-panel-wrapper, #top-panel { min-height: 0 !important; height: auto !important; }
+
+/* Nothing below this point is furniture the reader needs. */
+.jp-cell-toolbar,
+.jp-CellHeader,
+.jp-CellFooter,
+.jp-Collapser,
+.jp-OutputPrompt,
+.jp-WindowedPanel-scrollbar { display: none !important; }
+
+/* 4. The reading column ------------------------------------------------- */
+/* Bottom padding must be 0 here. .jp-Notebook is an absolutely-positioned,
+   fixed-size box that *contains* the scroller rather than scrolling itself, so
+   padding-bottom does not add breathing room after the last cell — it shrinks
+   the scrollable area and leaves a permanent dead band across the foot of the
+   window at every scroll position. Measured at 8rem: a 315px blank tail.
+   Trailing space belongs inside the scrolled content, on the inner panel. */
+.jp-Notebook { padding: 2.5rem 1.25rem 0 !important; }
+.jp-WindowedPanel-inner { margin-bottom: 5rem !important; }
+.jp-WindowedPanel-viewport {
+  max-width: calc(var(--measure-code) + var(--gutter)) !important;
+  margin: 0 auto !important;
+  /* JupyterLab ships `box-shadow: 0 2px 4px rgba(0,0,0,.2)` here. On a white
+     IDE ground it is invisible; on paper it drew a hard-edged rectangle that
+     read as a floating panel behind the whole chapter. */
+  box-shadow: none !important;
+}
+.jp-Notebook > .jp-Cell,
+.jp-WindowedPanel-inner .jp-Cell {
+  max-width: none !important;
+  margin: 0 !important;
+  padding: .55rem 0 !important;
+  border: none !important;
+  background: transparent !important;
+}
+/* Prose is narrower than code, both flush left, so code breaks out to the
+   right rather than straddling the column.
+   Jupyter already reserves --jp-cell-prompt-width as a gutter on every cell.
+   Adding our own padding on top of it double-indented prose, leaving it 39px
+   right of the code it describes. Only the inset past the hairline is ours. */
+.jp-MarkdownCell .jp-Cell-inputWrapper {
+  max-width: calc(var(--measure) + var(--gutter) + var(--code-inset));
+}
+.jp-MarkdownCell .jp-RenderedHTMLCommon { padding-left: var(--code-inset); }
+
+/* 5. Prose -------------------------------------------------------------- */
+.jp-RenderedHTMLCommon,
+.jp-MarkdownOutput {
+  font-family: var(--serif) !important;
+  font-size: 1.125rem !important;
+  line-height: 1.65 !important;
+  color: var(--ink) !important;
+  font-optical-sizing: auto;
+}
+.jp-RenderedHTMLCommon p { margin: 0 0 1.1em !important; }
+.jp-RenderedHTMLCommon h1,
+.jp-RenderedHTMLCommon h2,
+.jp-RenderedHTMLCommon h3,
+.jp-RenderedHTMLCommon h4 {
+  font-family: var(--serif) !important;
+  font-weight: 600 !important;
+  color: var(--ink) !important;
+  letter-spacing: -.008em !important;
+  line-height: 1.15 !important;
+}
+.jp-RenderedHTMLCommon h1 { font-size: 2.3em !important; margin: .2em 0 .5em !important; font-weight: 400 !important; }
+.jp-RenderedHTMLCommon h2 { font-size: 1.5em !important; margin: 2em 0 .5em !important; }
+.jp-RenderedHTMLCommon h3 { font-size: 1.22em !important; margin: 1.8em 0 .45em !important; }
+.jp-RenderedHTMLCommon a { color: var(--accent) !important; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+.jp-RenderedHTMLCommon code {
+  font-family: var(--mono) !important;
+  font-size: .84em !important;
+  background: var(--bg-soft) !important;
+  border: none !important;
+  padding: .08em .3em !important;
+  border-radius: 3px !important;
+}
+.jp-RenderedHTMLCommon img { border-radius: 3px; max-width: 100%; height: auto; }
+.jp-RenderedHTMLCommon blockquote {
+  border-left: 2px solid var(--rule) !important;
+  color: var(--muted) !important;
+  font-style: italic;
+  margin-left: 0 !important;
+  padding-left: 1.1rem !important;
+}
+.jp-RenderedHTMLCommon table { border-collapse: collapse !important; font-size: .92em !important; }
+.jp-RenderedHTMLCommon th {
+  font-family: var(--sans) !important;
+  font-size: .68rem !important;
+  letter-spacing: .1em; text-transform: uppercase;
+  font-weight: 500 !important;
+  color: var(--muted) !important;
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid var(--rule) !important;
+  text-align: left !important;
+}
+.jp-RenderedHTMLCommon td {
+  border: none !important;
+  border-bottom: 1px solid var(--rule-soft) !important;
+  background: transparent !important;
+}
+
+/* 6. Code cells: executable, but no box ---------------------------------- */
+/* No fill at all. A wash was tried at two strengths and both failed the same
+   way: chapters run several code cells back to back, each spanning the full
+   column, so the tints fuse into one continuous slab that reads as a panel
+   sitting on the page — measured as the topmost painted layer across the
+   whole column. What marks a cell executable is the left hairline, the mono
+   face, and the execution count in the margin. That is enough.
+   --code-tint is kept as a token so a wash can be reinstated in one line. */
+.jp-CodeCell .jp-Cell-inputWrapper { max-width: calc(var(--measure-code) + var(--gutter)); }
+.jp-CodeCell .jp-InputArea-editor {
+  background: var(--code-tint) !important;
+  border: none !important;
+  border-left: 1px solid var(--rule) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: .2rem 0 .2rem .9rem !important;
+  transition: border-color .12s ease;
+}
+.jp-CodeCell .cm-editor,
+.jp-CodeCell .cm-scroller { background: transparent !important; }
+.cm-content, .cm-line {
+  font-family: var(--mono) !important;
+  font-size: .85rem !important;
+  line-height: 1.72 !important;
+  color: var(--ink-soft) !important;
+}
+.cm-editor .cm-gutters { display: none !important; }
+.cm-editor.cm-focused { outline: none !important; }
+/* CodeMirror's own active-line and selection tints are IDE-loud on paper. */
+.cm-editor .cm-activeLine { background: transparent !important; }
+.jp-CodeCell .cm-selectionBackground,
+.jp-CodeCell ::selection { background: var(--rule) !important; }
+
+/* 7. Selection: the hairline changes colour. That is the whole signal. --- */
+/* JupyterLab draws its active-cell ring as `box-shadow: 0 0 0 1px #1976d2` on
+   .jp-Cell itself — not as a border, and not on the editor. Clearing the
+   editor's shadow alone left the blue ring fully visible. */
+.jp-Cell,
+.jp-Cell.jp-mod-active,
+.jp-Cell.jp-mod-selected,
+.jp-Cell.jp-mod-active.jp-mod-selected { box-shadow: none !important; }
+.jp-Cell.jp-mod-active .jp-InputArea-editor { border-left-color: var(--accent) !important; }
+.jp-Cell.jp-mod-active .jp-InputPrompt { color: var(--accent) !important; opacity: 1 !important; }
+.jp-Cell .jp-InputArea-editor,
+.jp-Cell.jp-mod-selected .jp-InputArea-editor { box-shadow: none !important; outline: none !important; }
+.jp-Notebook .jp-Cell.jp-mod-selected,
+.jp-Notebook:not(.jp-mod-commandMode) .jp-Cell.jp-mod-selected { background: transparent !important; }
+
+/* 8. The execution count as margin notation ----------------------------- */
+/* Jupyter already renders `[4]:` here. Demoted to a small figure hanging in
+   the left margin — it marks the cell as executable and records what ran.
+   (A hover-to-run control in this gutter is deferred; see TODO.md.) */
+.jp-InputArea-prompt,
+.jp-InputPrompt {
+  font-family: var(--mono) !important;
+  font-size: .68rem !important;
+  color: var(--muted) !important;
+  opacity: .45;
+  width: var(--gutter) !important;
+  min-width: var(--gutter) !important;
+  padding: .35rem .7rem 0 0 !important;
+  text-align: right !important;
+  transition: opacity .12s ease, color .12s ease;
+}
+.jp-Cell:hover .jp-InputPrompt { opacity: .9; }
+
+/* 9. Outputs read as results, not console dumps ------------------------- */
+.jp-Cell-outputWrapper {
+  padding-left: calc(var(--gutter) + var(--code-inset));
+  max-width: calc(var(--measure-code) + var(--gutter) + var(--code-inset));
+}
+.jp-OutputArea-output {
+  background: transparent !important;
+  border: none !important;
+  padding: .25rem 0 !important;
+  font-size: .82rem !important;
+  color: var(--muted) !important;
+}
+.jp-OutputArea-output pre {
+  font-family: var(--mono) !important;
+  line-height: 1.65 !important;
+  color: var(--muted) !important;
+}
+.jp-OutputArea-output.jp-RenderedHTMLCommon { color: var(--ink) !important; font-size: 1rem !important; }
+.jp-OutputArea-output img { background: #fff; border-radius: 3px; }
+/* Errors stay legible — this is a teaching notebook where exceptions are
+   deliberate content, not accidents. */
+.jp-OutputArea-output .ansi-red-fg,
+.jp-RenderedText[data-mime-type='application/vnd.jupyter.stderr'] { color: var(--syn-keyword) !important; }
+.jp-RenderedText[data-mime-type='application/vnd.jupyter.stderr'] { background: transparent !important; }
+
+/* 10. Classroom setup cells --------------------------------------------- */
+/* Hidden by the build, which marks them `jupyter.source_hidden` by matching
+   their content (see hide_setup_cells in scripts/build.py). This used to be a
+   `:first-child { display: none }` rule here, which was wrong for 57 of the 81
+   chapters — most of them open on their title heading, several on a real
+   import cell, and all of those were being blanked. Do not reinstate it: CSS
+   cannot tell a setup cell from a chapter title. */
+
+/* 11. Narrow screens: the gutter costs more than it gives --------------- */
+@media (max-width: 640px) {
+  :root { --gutter: 0rem; }
+  .jp-InputPrompt, .jp-InputArea-prompt { display: none !important; }
+  .jp-Notebook { padding: 1.5rem .9rem 0 !important; }
+  .jp-WindowedPanel-inner { margin-bottom: 3rem !important; }
+}

@@ -1,0 +1,140 @@
+/* Shared design tokens for the online edition.
+ *
+ * Loaded by BOTH the book layer (landing page, book indexes) and the
+ * JupyterLite chapter skin, so the two cannot drift apart. Before this file
+ * existed each maintained its own copy of the palette by hand, and they
+ * disagreed — the landing page had a dark mode and the chapters did not.
+ *
+ * Fonts are vendored, not linked to a CDN: an offline JupyterLite that
+ * reaches out to fonts.googleapis.com to render is not offline. The
+ * unicode-range splits are Google's own, so an English page fetches only the
+ * two `latin` files (~153KB) and pulls latin-ext lazily if a chapter ever
+ * needs it.
+ */
+
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('fonts/SourceSerif4-normal-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('fonts/SourceSerif4-normal-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: italic;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('fonts/SourceSerif4-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: italic;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('fonts/SourceSerif4-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url('fonts/JetBrainsMono-normal-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url('fonts/JetBrainsMono-normal-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: italic;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url('fonts/JetBrainsMono-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: italic;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url('fonts/JetBrainsMono-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+:root {
+  /* Type ---------------------------------------------------------------- */
+  --serif: 'Source Serif 4', Charter, 'Iowan Old Style', Georgia, serif;
+  --mono:  'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --sans:  -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif;
+
+  /* Measure. Prose sits at 34rem (~60 characters, a comfortable reading
+     column). Code breaks out to 42rem: at 34rem, 12.4% of the code lines in
+     these lectures overflow into a horizontal scroll; at 42rem, 6.7%. Set
+     --measure-code equal to --measure for a single uniform column. */
+  --measure: 34rem;
+  --measure-code: 42rem;
+  --gutter: 3rem;          /* left margin holding the execution count */
+  --code-inset: calc(.9rem + 1px);  /* hairline + padding before code text */
+
+  /* Warm paper ---------------------------------------------------------- */
+  --bg:        #fffff8;
+  --bg-soft:   #faf7e8;
+  --code-tint: transparent;  /* see custom-book.css §6 */
+  --ink:       #111110;
+  --ink-soft:  #26241d;
+  --muted:     #6f6a5e;
+  --rule:      #e2ddcd;
+  --rule-soft: #ece7d8;
+  --accent:    #8a3324;
+  --shadow:    rgba(60, 50, 20, .07);
+
+  /* Syntax, tuned to the paper ground: warm, low saturation, no neon. */
+  --syn-keyword:  #9a3b1f;
+  --syn-string:   #4a6b3a;
+  --syn-comment:  #9a9384;
+  --syn-number:   #7a5c2e;
+  --syn-def:      #2f5d7c;
+  --syn-builtin:  #6a4a8a;
+  --syn-operator: #6f6a5e;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Warm dark. Deliberately not a cool grey: it has to sit beside the
+       paper light without reading as a different site. */
+    --bg:        #16150f;
+    --bg-soft:   #1c1b14;
+    --code-tint: transparent;
+    --ink:       #e9e4d6;
+    --ink-soft:  #ddd8ca;
+    --muted:     #948d7e;
+    --rule:      #302d24;
+    --rule-soft: #26241c;
+    --accent:    #d9a066;
+    --shadow:    rgba(0, 0, 0, .4);
+
+    --syn-keyword:  #e08a5c;
+    --syn-string:   #a8c08a;
+    --syn-comment:  #6f695d;
+    --syn-number:   #d9a066;
+    --syn-def:      #8fb8d9;
+    --syn-builtin:  #c4a0e0;
+    --syn-operator: #948d7e;
+  }
+}

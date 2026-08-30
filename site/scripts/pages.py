@@ -125,6 +125,7 @@ def _shell(title, body, base, extra_head=""):
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{html.escape(title)}</title>
+<link rel="stylesheet" href="{base}tokens.css">
 <link rel="stylesheet" href="{base}site.css">
 {extra_head}
 </head>

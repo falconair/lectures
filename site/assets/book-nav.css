@@ -1,29 +1,55 @@
 /* Chapter navigation bar injected into JupyterLite notebook pages.
-   Kept separate from the optional reading skin: navigation is functionality
-   and must work whether or not the Jupyter chrome is restyled. */
+ *
+ * Kept separate from the chapter skin: navigation is functionality and must
+ * work whether or not apply_skin is on. Colours come from tokens.css, which
+ * is injected alongside it in both cases; the var() fallbacks keep the bar
+ * legible if it is ever loaded on its own.
+ *
+ * --booknav-h is the single source of truth for the bar's height. The Jupyter
+ * shell is pushed down by exactly that much, so changing the height here
+ * cannot leave the bar overlapping the menubar.
+ */
+
+:root { --booknav-h: 2.25rem; }
 
 .book-nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 10000;
   display: flex; align-items: center; gap: 1rem;
-  height: 34px; padding: 0 1rem;
-  background: #fff;
-  border-bottom: 1px solid #d8dce0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-size: .8rem;
-  color: #4b5563;
+  height: var(--booknav-h);
+  padding: 0 1.1rem;
+  background: var(--bg, #fffff8);
+  border-bottom: 1px solid var(--rule, #e2ddcd);
+  font-family: var(--sans, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  font-size: .72rem;
+  color: var(--muted, #6f6a5e);
 }
-.book-nav a { color: #2f6f4f; text-decoration: none; }
-.book-nav a:hover { text-decoration: underline; }
+.book-nav a { color: var(--muted, #6f6a5e); text-decoration: none; }
+.book-nav a:hover { color: var(--accent, #8a3324); }
+
 .bn-left { display: flex; align-items: center; gap: .5rem; min-width: 0; }
 .bn-book, .bn-prev, .bn-next {
   max-width: 15rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.bn-sep { color: #9aa3ad; }
-.bn-mid { flex: 1; text-align: center; color: #6b7280; }
-.bn-right { display: flex; gap: 1rem; align-items: center; }
+.bn-sep { opacity: .45; }
+.bn-mid {
+  flex: 1; text-align: center;
+  font-size: .64rem; letter-spacing: .12em; text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  opacity: .75;
+}
+.bn-right { display: flex; gap: 1.25rem; align-items: center; }
 
-/* push the Jupyter shell down so the bar never covers its menubar */
+/* Push the Jupyter shell down so the bar never covers its menubar.
+ *
+ * ONLY the outermost shell element of each app. #top-panel-wrapper and
+ * #jp-top-panel are absolutely positioned *inside* #main, so offsetting them
+ * too applied the shift twice and opened a dead band under the nav bar
+ * (measured: #main at y=36, #top-panel-wrapper at y=72). */
 body.has-book-nav #main,
-body.has-book-nav .jp-ThemedContainer,
-body.has-book-nav #jp-top-panel,
-body.has-book-nav .jp-LabShell { top: 34px !important; }
+body.has-book-nav .jp-LabShell { top: var(--booknav-h) !important; }
+
+@media (max-width: 640px) {
+  .bn-mid, .bn-book, .bn-sep { display: none; }
+  .book-nav { gap: .6rem; padding: 0 .8rem; }
+  .bn-prev, .bn-next { max-width: 8rem; }
+}
