@@ -152,11 +152,6 @@ Resizing the images is the easy win. `MAX_DATASET_BYTES` in
   `FileNotFoundError`. Deliberate in `280-exceptions`, which is teaching
   exceptions; broken in the other two. Either stage the two files or point the
   examples at something that ships. Belongs with item 7.
-- **Leaving a chapter prompts "Leave site?"** JupyterLab registers a
-  `beforeunload` handler and JupyterLite marks a notebook dirty on load, so the
-  nav bar's prev/next links raise a browser confirmation before every chapter
-  change — hit repeatedly while testing. Prev/next is the primary way through a
-  book, so this is worth solving before publishing.
 - **Markdown cells show light-mode syntax colours while being edited, in dark
   mode.** Python code is themed correctly through `--jp-mirror-editor-*`, but
   CodeMirror themes markdown source separately and those variables do not reach

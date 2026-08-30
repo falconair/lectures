@@ -215,11 +215,33 @@ def stage(config, files_base):
     }
 
 
+# JupyterLab and Notebook each ship a plugin whose only job is to raise the
+# browser's "Leave site?" dialog when the app is dirty:
+#
+#   "Check if the application is dirty before closing the browser tab."
+#   "Adds safeguard dialog when closing the browser tab with unsaved changes."
+#
+# In an IDE that is a safeguard. In a book it fires on every chapter change,
+# because JupyterLite marks a notebook dirty as soon as a reader runs a cell,
+# and prev/next is the main way through a book. It also guards nothing here:
+# JupyterLite does not persist edits across a reload, so the changes the dialog
+# warns about are already gone. Disabling the two plugins removes the dialog
+# and nothing else — neither does anything besides register that handler.
+DISABLED_EXTENSIONS = [
+    "@jupyter-notebook/application-extension:dirty",
+    "@jupyterlab/application-extension:dirty",
+]
+
+
 def build_app():
     """Run JupyterLite into _site/app/. Nothing else writes into that tree."""
     cfg = {"LiteBuildConfig": {"contents": [str(BUILD / "contents")],
                                "output_dir": str(APP)}}
     (BUILD / "jupyter_lite_config.json").write_text(json.dumps(cfg, indent=2))
+    # picked up from the lite dir and merged into the app's page config
+    (BUILD / "jupyter-lite.json").write_text(json.dumps(
+        {"jupyter-config-data": {"disabledExtensions": DISABLED_EXTENSIONS}},
+        indent=2))
     subprocess.run(["jupyter", "lite", "build"], cwd=BUILD, check=True)
 
 
