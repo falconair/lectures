@@ -69,9 +69,32 @@ this build, not `full`, so cell DOM stays in the document while scrolling.
 Per-cell injection does not have to survive node recycling.
 
 ### 5. Publish to GitHub Pages
-Set `base_url: "/lectures/"` in `site/books.yml`, then a workflow that builds
-and deploys `site/_site`. Watch: the 116MB LFS zip and the 2.7GB `datasets/`
-tree must stay out (the build already excludes them), and the site is ~130MB.
+`.github/workflows/pages.yml` is written and committed but has never run. It
+builds with `--base-url /lectures/` and deploys `site/_site` to
+https://falconair.github.io/lectures/ on any push to `main` touching
+`lectures/` or `site/`, and on manual dispatch.
+
+Do NOT set `base_url: "/lectures/"` in `books.yml` as this item used to advise
+— that breaks `python site/serve.py`, which needs `/`. The committed value
+stays `/` and CI passes the flag.
+
+Two steps remain, both yours:
+
+1. Merge to `main`, then set **Settings → Pages → Source = GitHub Actions**.
+   The workflow cannot enable Pages itself; until it is switched on, the deploy
+   job fails.
+2. Decide about `postcell.conf.bak` first (see Smaller items). It is tracked,
+   public, and carries a real `instructor_id`. Publishing exposes nothing the
+   public repo does not already, but a browsable site makes it findable.
+
+Verified before committing: a cold build with no doit cache takes 4s and
+produces 132MB — inside Pages' 1GB limit, largest single file 11MB against the
+100MB per-file cap. LFS is not fetched by the workflow, so the 116MB taxi-trips
+zip stays out; only 15MB of small datasets are staged.
+
+Watch after the first deploy: Pages has a soft 100GB/month bandwidth limit and
+Pyodide is a heavy first load per reader — including for the 19 chapters in
+item 7 that cannot execute anyway.
 
 ### 6. Your content pass
 Spelling, grammar, and clarity. Two typos already spotted, both of which are

@@ -301,10 +301,16 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--skip-app", action="store_true",
                     help="regenerate the book layer only; leave app/ alone")
+    ap.add_argument("--base-url",
+                    help="override books.yml base_url, e.g. /lectures/ when "
+                         "publishing to GitHub Pages under the repo path. Kept "
+                         "as a flag rather than a books.yml edit so the "
+                         "committed value stays '/' and site/serve.py keeps "
+                         "working locally.")
     args = ap.parse_args()
 
     config = load_books()
-    base_url = config.get("base_url", "/")
+    base_url = args.base_url or config.get("base_url", "/")
     if not base_url.endswith("/"):
         base_url += "/"
     apply_skin = bool(config.get("apply_skin", False))
