@@ -88,11 +88,23 @@ def collect(config, repo: Path):
 
 
 def nav_json(books):
-    """Lookup used by the in-app nav bar: notebook path -> its place in a book."""
-    index = {}
+    """Navigation data for the in-app chrome.
+
+    Two sections rather than one flat lookup. `chapters` maps a notebook path
+    to its position and neighbours, as before; `books` carries each book's full
+    chapter list once, for the sidebar. Keeping the list under `books` rather
+    than repeating it in every chapter entry keeps the file small — 81 chapters
+    would otherwise each carry a copy of their book's whole table of contents.
+    """
+    out = {"books": {}, "chapters": {}}
     for b in books:
+        out["books"][b["id"]] = {
+            "title": b["title"],
+            "chapters": [{"title": c["title"], "url": c["url"], "path": c["path"]}
+                         for c in b["chapters"]],
+        }
         for i, ch in enumerate(b["chapters"]):
-            index[ch["path"]] = {
+            out["chapters"][ch["path"]] = {
                 "book": b["title"],
                 "bookId": b["id"],
                 "n": i + 1,
@@ -101,7 +113,7 @@ def nav_json(books):
                 "prev": b["chapters"][i - 1] if i > 0 else None,
                 "next": b["chapters"][i + 1] if i + 1 < len(b["chapters"]) else None,
             }
-    return index
+    return out
 
 
 def search_index(books, repo: Path):

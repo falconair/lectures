@@ -43,12 +43,32 @@ courses were actually taught. Two calls most likely wrong:
 No notebook currently appears in two books. Real courses overlap — duplicate
 freely if that is truer.
 
-### 2. Fix a Windows path in one notebook
-`lectures/020_intro_to_jupyter/10 - Intro To Jupyter (not technical).ipynb`
-references `images\python_repl.png` with a backslash. On macOS and Linux a
-backslash is a filename character, not a separator, so **this image is broken
-in local Jupyter today**, not only in the site. The build works around it by
-normalising separators; the source is still wrong. One-character fix.
+### 2. Broken image references in source notebooks
+All of these are broken in local Jupyter too, not only in the site.
+
+**A Windows path.** `lectures/020_intro_to_jupyter/10 - Intro To Jupyter (not
+technical).ipynb` references `images\python_repl.png` with a backslash. On
+macOS and Linux a backslash is a filename character, not a separator. The build
+works around it by normalising separators; the source is still wrong.
+One-character fix.
+
+**Five images that do not exist anywhere in the repo**, referenced seven times.
+They 404 in the browser and show as broken in Jupyter:
+
+| Missing file | Referenced by |
+|---|---|
+| `030_intro_to_pandas/images/dataframes.jpg` | `110-…-series`, `120-…-dataframes`, `160-pandas-index` |
+| `030_intro_to_pandas/images/series.jpg` | `110-pandas-overview-series` |
+| `030_intro_to_pandas/images/splitapplycombine.png` | `150-pandas-groupby` |
+| `140-algorithms_datastructs/images/binary_tree.svg` | `100-data_structures` |
+| `lectures/sklearn_diff.png` | `Data Science in Python` |
+
+There is no `images/` directory in `030_intro_to_pandas` at all. Either the
+files were never committed or they were removed; check your working copies
+before recreating them.
+
+To re-check after fixing, the build's staged output can be scanned for
+`/app/files/` references whose target is absent.
 
 ### 3. The 18 parked notebooks
 Listed with reasons at the bottom of `site/books.yml`: `misc/` scratch files,

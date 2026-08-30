@@ -1,22 +1,29 @@
-/* Chapter navigation bar injected into JupyterLite notebook pages.
+/* Book chrome injected into JupyterLite notebook pages: a top bar, a left
+ * sidebar of the book's chapters, and a right sidebar of this chapter's
+ * headings.
  *
  * Kept separate from the chapter skin: navigation is functionality and must
- * work whether or not apply_skin is on. Colours come from tokens.css, which
- * is injected alongside it in both cases; the var() fallbacks keep the bar
+ * work whether or not apply_skin is on. Colours come from tokens.css, which is
+ * injected alongside it in both cases; the var() fallbacks keep the chrome
  * legible if it is ever loaded on its own.
  *
- * --booknav-h is the single source of truth for the bar's height. The Jupyter
- * shell is pushed down by exactly that much, so changing the height here
- * cannot leave the bar overlapping the menubar.
+ * --booknav-h and the two sidebar widths are the single source of truth for
+ * the shell's offsets, so changing one here cannot leave the chrome
+ * overlapping the notebook.
  */
 
-:root { --booknav-h: 2.25rem; }
+:root {
+  --booknav-h: 2.25rem;
+  --bn-left-w: 16rem;
+  --bn-right-w: 13rem;
+}
 
+/* ---- top bar ----------------------------------------------------------- */
 .book-nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 10000;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 10001;
   display: flex; align-items: center; gap: 1rem;
   height: var(--booknav-h);
-  padding: 0 1.1rem;
+  padding: 0 .6rem;
   background: var(--bg, #fffff8);
   border-bottom: 1px solid var(--rule, #e2ddcd);
   font-family: var(--sans, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
@@ -27,10 +34,9 @@
 .book-nav a:hover { color: var(--accent, #8a3324); }
 
 .bn-left { display: flex; align-items: center; gap: .5rem; min-width: 0; }
-.bn-book, .bn-prev, .bn-next {
+.bn-prev, .bn-next {
   max-width: 15rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.bn-sep { opacity: .45; }
 .bn-mid {
   flex: 1; text-align: center;
   font-size: .64rem; letter-spacing: .12em; text-transform: uppercase;
@@ -39,17 +45,105 @@
 }
 .bn-right { display: flex; gap: 1.25rem; align-items: center; }
 
-/* Push the Jupyter shell down so the bar never covers its menubar.
- *
- * ONLY the outermost shell element of each app. #top-panel-wrapper and
- * #jp-top-panel are absolutely positioned *inside* #main, so offsetting them
- * too applied the shift twice and opened a dead band under the nav bar
- * (measured: #main at y=36, #top-panel-wrapper at y=72). */
+.bn-toggle {
+  border: none; background: transparent; cursor: pointer;
+  color: var(--muted, #6f6a5e);
+  font: inherit; font-size: .85rem; line-height: 1;
+  padding: .25rem .4rem; border-radius: 4px;
+}
+.bn-toggle:hover { background: var(--bg-soft, #faf7e8); color: var(--ink, #111110); }
+
+/* ---- sidebars ---------------------------------------------------------- */
+.bn-side {
+  position: fixed; top: var(--booknav-h); bottom: 0; z-index: 10000;
+  overflow-y: auto; overscroll-behavior: contain;
+  background: var(--bg, #fffff8);
+  font-family: var(--sans, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  padding: 1.4rem 0 3rem;
+}
+.bn-side-left  { left: 0;  width: var(--bn-left-w);  border-right: 1px solid var(--rule, #e2ddcd); }
+.bn-side-right { right: 0; width: var(--bn-right-w); border-left: 1px solid var(--rule, #e2ddcd); }
+
+.bn-side-title {
+  font-size: .62rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--muted, #6f6a5e);
+  padding: 0 1.1rem .8rem;
+}
+.bn-side-left .bn-side-title {
+  font-family: var(--serif, Georgia, serif);
+  font-size: 1rem; letter-spacing: -.005em; text-transform: none;
+  color: var(--ink, #111110);
+  padding-bottom: 1rem;
+}
+
+/* left: chapter list */
+.bn-chapters { list-style: none; margin: 0; padding: 0; }
+.bn-chapter {
+  display: flex; gap: .6rem; align-items: baseline;
+  padding: .38rem 1.1rem;
+  font-size: .78rem; line-height: 1.35;
+  color: var(--muted, #6f6a5e); text-decoration: none;
+  border-left: 2px solid transparent;
+}
+.bn-chapter:hover { background: var(--bg-soft, #faf7e8); color: var(--ink, #111110); }
+.bn-num {
+  font-family: var(--mono, monospace); font-size: .66rem;
+  opacity: .6; min-width: 1.2rem; text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.bn-chapter-title { flex: 1; }
+.bn-current .bn-chapter {
+  color: var(--accent, #8a3324);
+  border-left-color: var(--accent, #8a3324);
+  background: var(--bg-soft, #faf7e8);
+}
+
+/* right: this chapter's headings */
+.bn-toc { list-style: none; margin: 0; padding: 0; }
+.bn-toc-link {
+  display: block;
+  padding: .3rem 1.1rem;
+  font-size: .74rem; line-height: 1.35;
+  color: var(--muted, #6f6a5e); text-decoration: none;
+  border-left: 2px solid transparent;
+}
+.bn-toc-link:hover { color: var(--ink, #111110); }
+.bn-toc-link.bn-active {
+  color: var(--accent, #8a3324);
+  border-left-color: var(--accent, #8a3324);
+}
+.bn-toc-h3 .bn-toc-link { padding-left: 2rem; font-size: .72rem; }
+.bn-toc-h4 .bn-toc-link { padding-left: 2.9rem; font-size: .7rem; }
+/* a chapter with no subheadings should not show an empty rail, and should not
+   reserve width for one either */
+body.bn-empty-right .bn-side-right,
+body.bn-empty-right .bn-toggle-right { display: none; }
+
+/* ---- make room in the Jupyter shell ------------------------------------ */
+/* Only the outermost shell element of each app. #top-panel-wrapper and
+   #jp-top-panel are absolutely positioned inside #main, so offsetting them too
+   applies the shift twice. */
 body.has-book-nav #main,
 body.has-book-nav .jp-LabShell { top: var(--booknav-h) !important; }
 
+body.has-bn-left:not(.bn-hide-left) #main,
+body.has-bn-left:not(.bn-hide-left) .jp-LabShell { left: var(--bn-left-w) !important; }
+body.has-bn-right:not(.bn-hide-right):not(.bn-empty-right) #main,
+body.has-bn-right:not(.bn-hide-right):not(.bn-empty-right) .jp-LabShell { right: var(--bn-right-w) !important; }
+
+body.bn-hide-left  .bn-side-left  { display: none; }
+body.bn-hide-right .bn-side-right { display: none; }
+
+/* ---- narrow screens ---------------------------------------------------- */
+/* Below this the reading column cannot afford either rail. The toggles go too:
+   there is nothing useful to toggle back to. */
+@media (max-width: 1100px) {
+  .bn-side, .bn-toggle { display: none !important; }
+  body.has-bn-left #main, body.has-bn-left .jp-LabShell { left: 0 !important; }
+  body.has-bn-right #main, body.has-bn-right .jp-LabShell { right: 0 !important; }
+}
 @media (max-width: 640px) {
-  .bn-mid, .bn-book, .bn-sep { display: none; }
+  .bn-mid { display: none; }
   .book-nav { gap: .6rem; padding: 0 .8rem; }
   .bn-prev, .bn-next { max-width: 8rem; }
 }
