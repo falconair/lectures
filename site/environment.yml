@@ -1,0 +1,13 @@
+# Environment for building the online edition:
+#   conda env create -f site/environment.yml
+#   conda activate jlite
+#   ./site/build.sh
+name: jlite
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - jupyterlite-core          # site generator
+  - jupyterlite-pyodide-kernel # Python-in-the-browser kernel
+  - jupyter_server            # required to stage custom contents
+  - pyyaml                    # reads site/books.yml
