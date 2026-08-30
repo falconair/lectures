@@ -1,7 +1,27 @@
 # Online edition — outstanding work
 
-Running list for the `online-book` branch. Nothing here blocks the build; it
-all runs today via `./site/build.sh` and `python site/serve.py`.
+Running list for the online edition. Nothing here blocks the build; it all runs
+today via `./site/build.sh` and `python site/serve.py`.
+
+---
+
+## Start here
+
+Sequenced. Everything below this section is detail for these.
+
+1. **Switch Pages on and publish.** Settings → Pages → Source = GitHub Actions,
+   then push to `main` or dispatch the workflow by hand. Until Pages is
+   switched on the deploy job fails while the build job passes. (item 5)
+2. **Decide about `postcell.conf.bak`** before anyone is pointed at the site.
+   Tracked, public, real `instructor_id`. (Smaller items)
+3. **Look at chapters with rich output.** The skin has only been checked on
+   four chapters. (item 11)
+4. **Correct the book map.** The grouping was inferred, not taken from how you
+   taught. Wrong order is the most visible thing a reader meets. (item 1)
+5. **Decide what Machine Learning Engineering should be.** 17 of its 27
+   chapters cannot execute in the browser. (item 7)
+6. **Your content pass** — spelling, grammar, two known typos that are also
+   filenames. (item 6)
 
 ---
 
@@ -126,6 +146,25 @@ That book may need a different treatment from the other three.
 
 `%%writefile` (7 chapters) is fine — it writes to Pyodide's virtual
 filesystem. It only breaks where a shell escape then runs the file.
+
+### 11. The skin has only been seen on four chapters
+The reading skin was checked against `140-strings`, `130-pandas-dataframes-
+operations`, `linear_regression_with_numpy` and the two book pages — in light
+and dark, at one window width. That leaves 77 chapters unseen.
+
+The cases most likely to need work, none of them yet looked at:
+
+- **Rendered dataframes.** Pandas emits its own `<table>` styling into the
+  output area. Against the paper ground it may fight the typography or carry
+  white backgrounds. Roughly half of `030_intro_to_pandas` is dataframe output.
+- **Matplotlib figures.** Rendered on a white canvas, which will read as a
+  bright rectangle in dark mode. `custom-book.css` sets a white background on
+  output images deliberately, so figures stay legible — worth confirming that
+  looks intentional rather than broken.
+- **Wide images.** Several lectures carry screenshots wider than the 42rem
+  code measure; they are capped at `max-width: 100%` but have not been seen.
+- **Long error tracebacks.** Chapters that raise on purpose (item 9) put a
+  stderr block in the output area with its own colouring.
 
 ### 8. Verify async and matplotlib chapters
 - `025_all_of_python_basics/310-async.ipynb` — Pyodide already runs inside an
