@@ -1,31 +1,45 @@
 """
-PROBLEM 1: make the program print its answer and take the ticker from the command line
+PROBLEM 1: make the program print the last close of the ticker given on the command line
+
+YOUR TASK
+    Rewrite the lines below the line marked YOUR WORK. Do not change anything above it.
+    Your work is checked by running the commands at the end of this comment.
+    These are graded:
+      - the ticker is read from the command line
+      - it prints one line: the ticker, a space, and that ticker's last closing price
+      - no ticker on the command line: it prints one line that tells the user how to
+        run the program, and the exit status is 1
+      - a ticker that is not in prices.csv: it prints one line that says there is no
+        such ticker, and the exit status is 1
+      - it never ends with a Python error (a "Traceback")
+    Write your code directly below the line, not inside a function, as the lecture's
+    programs do. No "if __name__ == ..." is needed.
 
 THE PROGRAM
     It looks up the most recent closing price of one stock in prices.csv.
 
 WHAT IS WRONG WITH IT (this is the bug you are fixing)
-    1. It prints nothing. Try it:  python p1_last_close.py
-    2. The ticker is written into the code, so it can only ever look up AAPL.
-       Try it:  python p1_last_close.py MSFT   (still nothing, and MSFT is ignored)
+    1. python p1_last_close.py         prints nothing
+    2. python p1_last_close.py MSFT    prints nothing
 
 WHEN YOU ARE DONE, these commands behave like this
-    python p1_last_close.py AAPL    prints:  AAPL 254.63
-    python p1_last_close.py MSFT    prints:  MSFT 517.95
-    python p1_last_close.py         prints one line telling the user how to run it,
-                                    and exits with status 1
+    python p1_last_close.py AAPL
+        AAPL 254.63
+    python p1_last_close.py MSFT
+        MSFT 517.95
+    python p1_last_close.py
+        (one line that says how to run the program)
+        exit status 1
+    python p1_last_close.py ZZZ
+        (one line that says there is no such ticker)
+        exit status 1
 
-    (An exit status is the number a program hands back when it ends: 0 means it
-    worked. To see the status of the program you just ran, type:  echo $?  )
-
-YOUR TASK
-    Rewrite the lines at the bottom, below the line marked YOUR WORK.
-    Do not change anything above that line.
-    Use sys.argv, as in the lecture's program4.py and program5.py.
-    Write plain top-level code, as the lecture does. No "if __name__ == ..." is needed.
+    Exit status: a number a program returns when it ends (0 = it worked). To see it, the
+    very next command must be:  echo $?
 """
 
 import csv
+import sys
 from pathlib import Path
 
 # prices.csv sits in the same folder as this file, wherever you run it from

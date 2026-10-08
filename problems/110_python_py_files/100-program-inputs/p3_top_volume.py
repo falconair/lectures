@@ -1,43 +1,53 @@
 """
-PROBLEM 3: tell argparse what kind of value each argument must be
+PROBLEM 3: make argparse refuse a badly written date or --top, and give --top a default of 3
+
+YOUR TASK
+    Change the lines below the line marked YOUR WORK. Do not change anything above it.
+    Your work is checked by running the commands at the end of this comment.
+    These are graded:
+      - without --top, it prints the 3 most traded stocks
+      - with --top N, it prints the N most traded stocks; N is a whole number, 1 or more
+      - --top with any other value (five, 0): argparse error message, exit status 2
+      - a date that is not written exactly YYYY-MM-DD (9/10/2025, 2025-9-10):
+        argparse error message, exit status 2
+    "argparse error message" means: argparse prints a line that starts with "usage:"
+    and a line that starts with "error:", followed by your message. You choose only
+    your message.
+    Not part of the task: a correctly written date with no trading (2025-09-06, a
+    Saturday) prints nothing, with exit status 0. That is correct; leave it.
+    You need three things the lecture did not show: see the comments above YOUR WORK.
+    You will write one or two small functions below the line; the rest is plain code,
+    not inside a function. No "if __name__ == ..." is needed.
 
 THE PROGRAM
     It prints the most heavily traded stocks on one day, busiest first.
     It already uses argparse: a date, and an optional --top for how many to print.
 
 WHAT IS WRONG WITH IT (this is the bug you are fixing)
-    The arguments are declared, but argparse was never told what they should look
-    like, so bad values get through and good ones break. Try each:
-        python p3_top_volume.py 2025-09-10            prints all 10 stocks; it should print 3
-        python p3_top_volume.py 2025-09-10 --top 5    crashes with a TypeError
-        python p3_top_volume.py 9/10/2025             prints nothing and reports success
+    1. python p3_top_volume.py 2025-09-10            prints all 10 stocks
+    2. python p3_top_volume.py 2025-09-10 --top 5    ends with a TypeError
+    3. python p3_top_volume.py 9/10/2025             prints nothing; the exit status is 0
 
 WHEN YOU ARE DONE, these commands behave like this
-    python p3_top_volume.py 2025-09-10             prints exactly these three lines:
-                                                       NVDA 226852000
-                                                       AAPL 83440800
-                                                       TSLA 72121700
-    python p3_top_volume.py 2025-09-10 --top 5     prints 5 lines
-    python p3_top_volume.py 2025-09-10 --top five  argparse error message, exit status 2
-    python p3_top_volume.py 2025-09-10 --top 0     argparse error message, exit status 2
-                                                   (--top must be 1 or more)
-    python p3_top_volume.py 9/10/2025              argparse error message, exit status 2
-                                                   (dates must be written YYYY-MM-DD)
+    python p3_top_volume.py 2025-09-10
+        NVDA 226852000
+        AAPL 83440800
+        TSLA 72121700
+    python p3_top_volume.py 2025-09-10 --top 5
+        (the same three lines, then two more)
+    Each of the next four: argparse error message, exit status 2
+        python p3_top_volume.py 2025-09-10 --top five
+        python p3_top_volume.py 2025-09-10 --top 0
+        python p3_top_volume.py 9/10/2025
+        python p3_top_volume.py 2025-9-10
 
-    (An exit status is the number a program hands back when it ends: 0 means it
-    worked. To see the status of the program you just ran, type:  echo $?  )
-
-YOUR TASK
-    Fix the lines at the bottom, below the line marked YOUR WORK, so that argparse
-    does the checking. Do not change anything above that line.
-    This goes one step past the lecture. Look up three things in the argparse
-    documentation: type=, default=, and argparse.ArgumentTypeError (you raise it
-    from a small function of your own to reject a value).
-    Write plain top-level code. No "if __name__ == ..." is needed.
+    Exit status: a number a program returns when it ends (0 = it worked). To see it, the
+    very next command must be:  echo $?
 """
 
 import argparse
 import csv
+import datetime
 from pathlib import Path
 
 # prices.csv sits in the same folder as this file, wherever you run it from
@@ -45,7 +55,10 @@ PRICES = Path(__file__).parent / "prices.csv"
 
 
 def top_by_volume(day, top):
-    """Return the `top` most traded tickers on day as (ticker, volume) pairs, busiest first."""
+    """Return the `top` most traded tickers on day (text, "YYYY-MM-DD"), busiest first.
+
+    The result is a list of (ticker, volume) pairs. `top` is a whole number.
+    """
     rows = []
     with open(PRICES, newline="") as handle:
         for row in csv.DictReader(handle):
@@ -53,6 +66,26 @@ def top_by_volume(day, top):
                 rows.append((row["ticker"], int(row["volume"])))
     rows.sort(key=lambda pair: -pair[1])  # minus: largest volume first
     return rows[:top]
+
+
+# NOT IN THE LECTURE (1 and 2): two more things that add_argument accepts.
+#   default=VALUE    the value used when the user leaves an optional argument out
+#   type=FUNCTION    argparse calls FUNCTION with the text the user typed, and whatever
+#                    FUNCTION returns becomes the value in args. (The lecture's
+#                    program6.py used type=str.) FUNCTION can be one you write. To
+#                    refuse the text, your function runs this line:
+#                        raise argparse.ArgumentTypeError("your message")
+#                    argparse then prints its error message and exits with status 2.
+#
+# NOT IN THE LECTURE (3): checking that a text is a date. This function is correct;
+# use it as it is.
+def is_date(text):
+    """Return True if text is a real date written exactly YYYY-MM-DD, such as "2025-09-10"."""
+    try:  # try the indented line; if it fails with a ValueError, do the "except" part
+        datetime.datetime.strptime(text, "%Y-%m-%d")  # ValueError if text is not a date
+    except ValueError:
+        return False
+    return len(text) == 10  # strptime also accepts "2025-9-10"; this refuses it
 
 
 # ---- YOUR WORK: everything below this line ---------------------------------

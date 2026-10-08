@@ -1,0 +1,12 @@
+ticker,company,industry,sector
+AAPL,Apple Inc.,Computer Hardware,Technology
+AMZN,Amazon.com Inc.,Retail - Apparel & Specialty,Consumer Cyclical
+F,Ford Motor Company,Autos,Consumer Cyclical
+GME,GameStop Corporation,Retail - Apparel & Specialty,Consumer Cyclical
+JPM,JP Morgan Chase & Co.,Banks,Financial Services
+KO,Coca-Cola Company (The),Beverages - Non-Alcoholic,Consumer Defensive
+MSFT,Microsoft Corporation,Application Software,Technology
+NVDA,NVIDIA Corporation,Semiconductors,Technology
+SPY,SPDR S&P 500,,
+TSLA,Tesla Inc.,Autos,Consumer Cyclical
+XOM,Exxon Mobil Corporation,Oil & Gas - Integrated,Energy

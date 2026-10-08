@@ -1,44 +1,55 @@
 """
-PROBLEM 4: make the program safe on the wrong machine and honest about failing
+PROBLEM 4: publish only on the production server, and exit with status 1 on bad input
+
+YOUR TASK
+    Change the lines below the line marked YOUR WORK. Do not change anything above it.
+    Your work is checked by running the commands at the end of this comment with
+    several values of SERVER_TYPE, and by reading published.csv after each run.
+    These are graded:
+      - SERVER_TYPE is not set, or is DEV: it prints the average line, publishes nothing
+      - SERVER_TYPE is PROD: it prints the average line and adds one line to published.csv
+      - SERVER_TYPE has any other value (for example prod in small letters, or set but
+        empty): it prints one line that says the value is not accepted, exit status 1
+      - the ticker is not in prices.csv, whatever SERVER_TYPE is: it prints one line that
+        says so, exit status 1
+      - in the last two cases it does not print the average line and publishes nothing
+    If the ticker and SERVER_TYPE are both wrong, either of the two messages will do.
+    A ticker is always given on the command line. You need not handle a missing one.
+    Write your code directly below the line, not inside a function, as the lecture's
+    programs do. No "if __name__ == ..." is needed.
 
 THE PROGRAM
-    It runs every evening and prints one stock's average closing price for the month.
-    On the production server it also adds that result to published.csv, which other
-    people read in the morning. Whether a machine is the production server is set
-    once, on that machine, in the environment variable SERVER_TYPE.
+    Every evening it prints one stock's average closing price for the month. On the
+    production server it also adds that result to published.csv, which other people read
+    in the morning. The environment variable SERVER_TYPE says which machine this is.
 
 WHAT IS WRONG WITH IT (this is the bug you are fixing)
-    1. A machine where nobody set SERVER_TYPE is treated as the production server.
-       Try it:  python p4_publish.py KO    then look in this folder: published.csv
-       has appeared. Your laptop just published.
-    2. When it fails, it says so and then carries on, publishes a made-up result,
-       and reports success.
-       Try it:  python p4_publish.py ZZZ   then look at published.csv again.
+    1. python p4_publish.py KO     (SERVER_TYPE not set)
+       published.csv appears in this folder. This machine is not the production server.
+    2. python p4_publish.py ZZZ    (SERVER_TYPE not set)
+       It prints "no data for ZZZ" and then "ZZZ 0 days, average close 0.00", adds the
+       line ZZZ,0,0.00 to published.csv, and the exit status is 0.
 
-WHEN YOU ARE DONE, it behaves like this
-    python p4_publish.py KO       prints:  KO 21 days, average close 67.04
-    ...and what else happens depends on SERVER_TYPE:
-        not set                   nothing is published (treat this as DEV)
-        DEV                       nothing is published
-        PROD                      the line  KO,21,67.04  is added to published.csv
-        anything else             prints one line saying so, exits with status 1,
-                                  publishes nothing
-    python p4_publish.py ZZZ      (no such ticker) prints one line saying so, exits
-                                  with status 1, publishes nothing, whatever SERVER_TYPE is
-
-    (An exit status is the number a program hands back when it ends: 0 means it
-    worked. To see the status of the program you just ran, type:  echo $?  )
+WHEN YOU ARE DONE, these commands behave like this
+    python p4_publish.py KO
+        SERVER_TYPE   it prints                            added to published.csv   exit status
+        not set       KO 21 days, average close 67.04      nothing                  0
+        DEV           KO 21 days, average close 67.04      nothing                  0
+        PROD          KO 21 days, average close 67.04      KO,21,67.04              0
+        other value   (one line: value not accepted)       nothing                  1
+    python p4_publish.py ZZZ
+        any value     (one line: no such ticker)           nothing                  1
 
 HOW TO SET AN ENVIRONMENT VARIABLE WHILE TESTING
     Mac / Linux:          export SERVER_TYPE=DEV       (undo with: unset SERVER_TYPE)
+                          Without the word export, the program does not see the value.
+                          To set it to empty:  export SERVER_TYPE=
     Windows cmd:          set SERVER_TYPE=DEV          (undo with: set SERVER_TYPE=)
     Windows PowerShell:   $env:SERVER_TYPE = "DEV"     (undo with: Remove-Item Env:SERVER_TYPE)
     Delete published.csv between tests.
 
-YOUR TASK
-    Fix the lines at the bottom, below the line marked YOUR WORK.
-    Do not change anything above that line.
-    Write plain top-level code. No "if __name__ == ..." is needed.
+    Exit status: a number a program returns when it ends (0 = it worked). To see it, the
+    very next command must be:  echo $?
 """
 
 import csv
