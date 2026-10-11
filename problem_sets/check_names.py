@@ -1,8 +1,8 @@
 """Check that every problem set still matches a lecture.
 
-    python problems/check_names.py        (run from anywhere)
+    python problem_sets/check_names.py        (run from anywhere)
 
-The rule: problems/<topic folder>/<name>/ belongs to the lecture file
+The rule: problem_sets/<topic folder>/<name>/ belongs to the lecture file
 lectures/<topic folder>/<name>.<anything> (a notebook, a markdown file, a deck).
 If a lecture is renamed or moved, its problem set must be renamed or moved the
 same way. This prints every problem set that no longer has a lecture, with the
@@ -15,7 +15,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 LECTURES = REPO / "lectures"
-PROBLEMS = REPO / "problems"
+PROBLEMS = REPO / "problem_sets"
 
 
 def lecture_names(topic):
@@ -33,7 +33,7 @@ def main():
         names = lecture_names(topic_folder.name)
         for problem_set in sorted(p for p in topic_folder.iterdir() if p.is_dir()):
             checked += 1
-            where = f"problems/{topic_folder.name}/{problem_set.name}"
+            where = f"problem_sets/{topic_folder.name}/{problem_set.name}"
             if names is None:
                 topics = [p.name for p in LECTURES.iterdir() if p.is_dir()]
                 close = difflib.get_close_matches(topic_folder.name, topics, n=3)
