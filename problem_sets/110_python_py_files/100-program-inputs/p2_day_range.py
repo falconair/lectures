@@ -1,44 +1,14 @@
 """
-PROBLEM 2: replace the typed-in questions with argparse arguments, and report missing data
+PROBLEM 2
+Practises: reading command-line arguments with argparse.
 
-YOUR TASK
-    Rewrite the lines below the line marked YOUR WORK. Do not change anything above it.
-    Your work is checked by running the commands at the end of this comment.
-    These are graded:
-      - the ticker and the date are two command-line arguments, read with argparse
-      - the program never waits for the user to type something
-      - when there is data, it prints the same line as it does now, with the range
-      - --help shows a help text, written by you, beside each of the two arguments
-      - an argument is missing: argparse's own error message, exit status 2
-      - there is no data for that ticker and day: it prints one line that says so
-        instead of the "range" line, and the exit status is 1
-    Write your code directly below the line, not inside a function, as the lecture's
-    programs do. No "if __name__ == ..." is needed.
+Task: fill in the function parse_args.
 
-THE PROGRAM
-    It prints how far one stock moved in one day: that day's high minus its low.
-
-WHAT IS WRONG WITH IT (this is the bug you are fixing)
-    1. python p2_day_range.py
-       It stops and waits for a person to type the ticker and then the date. When the
-       program is started automatically at night, nobody is there to type.
-    2. Run it again and type TSLA, then 2025-09-06 (a Saturday).
-       It prints  TSLA 2025-09-06 range None  and the exit status is 0.
-
-WHEN YOU ARE DONE, these commands behave like this
+To check your work, type:
     python p2_day_range.py TSLA 2025-09-10
-        TSLA 2025-09-10 range 10.26
-    python p2_day_range.py --help
-        (argparse's help text, with your help text beside each argument)
-    python p2_day_range.py TSLA
-        (argparse's error message)
-        exit status 2
-    python p2_day_range.py TSLA 2025-09-06
-        (one line that says there is no data)
-        exit status 1
 
-    Exit status: a number a program returns when it ends (0 = it worked). To see it, the
-    very next command must be:  echo $?
+It should print the ticker and the day that parse_args returned, then that day's high minus its low:
+    TSLA 2025-09-10 range 10.26
 """
 
 import argparse
@@ -50,17 +20,39 @@ from pathlib import Path
 PRICES = Path(__file__).parent / "prices.csv"
 
 
-def day_range(ticker, day):
-    """Return high minus low for ticker on day ("YYYY-MM-DD"), or None if there is no such row."""
+def parse_args(argv: list[str]) -> argparse.Namespace:
+    """Read a ticker and a day from the command line, using argparse.
+
+    Both are required. Give each one a help text, so that --help explains it.
+
+    Args:
+        argv: what the user typed after the program's name, as a list of text.
+
+    Returns:
+        What argparse returns: the ticker is in .ticker and the day is in .day.
+
+    Example:
+        parse_args(["TSLA", "2025-09-10"])
+    returns
+        Namespace(ticker='TSLA', day='2025-09-10')
+    """
+    raise NotImplementedError  # YOUR WORK: replace this line
+
+
+# ---- do not change anything below this line --------------------------------
+def day_range(ticker: str, day: str) -> float:
+    """Return high minus low for ticker on day (nan if there is no such row)."""
     with open(PRICES, newline="") as handle:
         for row in csv.DictReader(handle):
             if row["ticker"] == ticker and row["date"] == day:
                 return round(float(row["high"]) - float(row["low"]), 2)  # round to cents
-    return None
+    return float("nan")
 
 
-# ---- YOUR WORK: everything below this line ---------------------------------
-ticker = input("Ticker: ")
-day = input("Date (YYYY-MM-DD): ")
+if __name__ == "__main__":
+    args = parse_args(sys.argv[1:])  # [1:] leaves out the program's name
+    print(f"{args.ticker} {args.day} range {day_range(args.ticker, args.day)}")
 
-print(f"{ticker} {day} range {day_range(ticker, day)}")
+# NOTES
+#   Not in the lecture: parser.parse_args(argv) reads the list argv. With nothing
+#   between the brackets, as in the lecture, it reads sys.argv[1:] itself.

@@ -1,48 +1,18 @@
 """
-PROBLEM 4: make a rewritten function give exactly the answers the old one gave
+PROBLEM 4
+Practises: checking that tidied code still does what the old code did.
 
-YOUR TASK
-    Fix the code below the line marked YOUR WORK. Change nothing above that line,
-    and leave the comparison at the bottom of the file as it is.
-    Your work is checked by calling volume_weighted_closes with the rows of
-    prices.csv and with short made-up lists of rows that you do not have.
-    - volume_weighted_closes(rows, min_volume) returns exactly what
-      summ(rows, min_volume) returns, and has no other effect, for any rows
-      and any min_volume.
-    - The new version does not call summ.
-    - It keeps its four small functions and their names.
-    - Every docstring says what the code does after your changes.
-    ruff is not part of this problem.
+Task: repair volume_weighted_closes and the functions it calls, so that it
+returns exactly what summ returns and leaves the rows it is given unchanged.
+It differs from summ in four ways.
 
-THE PROGRAM
-    For each stock it prints the number of trading days, the total shares traded
-    and the volume-weighted average closing price, counting only the days on which
-    at least MIN_VOLUME shares traded. MIN_VOLUME comes from the command line.
-    The file holds two versions of the function that does this:
-        summ                    the old one. Hard to read, but it has run every
-                                night for two years. Its answers are correct.
-        volume_weighted_closes  summ rewritten by an AI assistant: clear names,
-                                small functions, docstrings. It came with the
-                                note "Only cleaner. No change in behaviour."
-    The program runs both, prints both answers, and then SAME or DIFFERENT.
-
-WHAT IS WRONG WITH IT (this is the bug you are fixing)
-    The note is false. Try it:
-        python p4_review_tidy_up.py 0
-        python p4_review_tidy_up.py 60000000
-        python p4_review_tidy_up.py 83440800
-    Every one ends with DIFFERENT. Between them they show four ways in which the
-    new version behaves differently from the old one; find all four.
-    The four differences are not one in each function. Each fix is a few lines
-    at most.
-
-WHEN YOU ARE DONE, these commands behave like this
+To check your work, type these three commands:
     python p4_review_tidy_up.py 0
     python p4_review_tidy_up.py 60000000
     python p4_review_tidy_up.py 83440800
-    The last line each of them prints, and the last line for any other whole
-    number you try, is:
-        SAME
+
+The last line each of them prints should be:
+    SAME
 """
 
 import csv
@@ -53,26 +23,7 @@ from pathlib import Path
 PRICES = Path(__file__).parent / "prices.csv"
 
 
-def load_rows():
-    """Return one dict per stock per day (ticker, date, close, volume), oldest day first."""
-    rows = []
-    with open(PRICES, newline="") as handle:
-        for row in csv.DictReader(handle):  # one dict per line of the file
-            rows.append(
-                {
-                    "ticker": row["ticker"],
-                    "date": row["date"],
-                    "close": float(row["close"]),
-                    "volume": int(row["volume"]),
-                }
-            )
-    rows.sort(
-        key=lambda row: row["date"]
-    )  # the file is grouped by ticker; put it in date order
-    return rows
-
-
-# The old version. Do not change it: what it returns is, by definition, correct.
+# The old version: hard to read, but what it returns is correct. Do not change it.
 def summ(rows, min_volume=1):
     t = {}
     for r in rows:
@@ -90,13 +41,15 @@ def summ(rows, min_volume=1):
     return out
 
 
-# ---- YOUR WORK: everything below this line ---------------------------------
-def is_busy_enough(row, min_volume):
+# The new version: summ rewritten with clear names, small functions and docstrings.
+# It was meant to be only cleaner.
+# ---- YOUR WORK: the four functions below ------------------------------------
+def is_busy_enough(row: dict, min_volume: int) -> bool:
     """Return True when enough shares traded that day for it to count."""
     return row["volume"] > min_volume
 
 
-def drop_quiet_days(rows, min_volume):
+def drop_quiet_days(rows: list[dict], min_volume: int) -> list[dict]:
     """Remove the days on which too few shares traded."""
     for row in list(rows):  # list(rows) is a copy to loop over
         if not is_busy_enough(row, min_volume):
@@ -104,24 +57,27 @@ def drop_quiet_days(rows, min_volume):
     return rows
 
 
-def total_by_ticker(rows):
+def total_by_ticker(rows: list[dict]) -> dict[str, tuple]:
     """Add up days, shares and traded value (shares times close) for each ticker."""
     totals = {}
     for row in rows:
         # .get: this ticker's totals so far, or (0, 0, 0.0) the first time
         days, shares, value = totals.get(row["ticker"], (0, 0, 0.0))
-        totals[row["ticker"]] = (
-            days + 1,
-            shares + row["volume"],
-            value + row["volume"] * row["close"],
-        )
+        totals[row["ticker"]] = (days + 1, shares + row["volume"], value + row["volume"] * row["close"])
     return totals
 
 
-def volume_weighted_closes(rows, min_volume=1):
+def volume_weighted_closes(rows: list[dict], min_volume: int = 1) -> list[tuple]:
     """Return (ticker, days, total shares, volume-weighted average close) for each ticker.
 
     Days on which fewer than min_volume shares traded are ignored.
+
+    Args:
+        rows: one dict per stock per day, with the keys "ticker", "close" and "volume".
+        min_volume: the fewest shares a day must have traded to be counted.
+
+    Returns:
+        One tuple per ticker, exactly as summ(rows, min_volume) returns them.
     """
     totals = total_by_ticker(drop_quiet_days(rows, min_volume))
     summary = []
@@ -131,30 +87,32 @@ def volume_weighted_closes(rows, min_volume=1):
     return summary
 
 
-# ---- THE COMPARISON: leave everything below this line as it is ---------------
-if len(sys.argv) != 2 or not sys.argv[1].isdigit():
-    print(
-        "usage: python p4_review_tidy_up.py MIN_VOLUME      (a whole number of shares)"
-    )
-    sys.exit(1)
-min_volume = int(sys.argv[1])
+# ---- do not change anything below this line --------------------------------
+def load_rows() -> list[dict]:
+    """Return one dict per stock per day (ticker, date, close, volume), oldest day first."""
+    rows = []
+    with open(PRICES, newline="") as handle:
+        for row in csv.DictReader(handle):  # one dict per line of the file
+            rows.append(
+                {"ticker": row["ticker"], "date": row["date"], "close": float(row["close"]), "volume": int(row["volume"])}
+            )
+    rows.sort(key=lambda row: row["date"])  # the file is grouped by ticker; put it in date order
+    return rows
 
-old_rows = load_rows()
-old_answer = summ(old_rows, min_volume)
 
-new_rows = load_rows()
-rows_before = len(new_rows)
-new_answer = volume_weighted_closes(new_rows, min_volume)
+if __name__ == "__main__":
+    min_volume = int(sys.argv[1])
 
-for line in old_answer:
-    print("old", line)
-for line in new_answer:
-    print("new", line)
-print(
-    "rows given to the new function:",
-    rows_before,
-    "before the call,",
-    len(new_rows),
-    "after",
-)
-print("SAME" if new_answer == old_answer and new_rows == old_rows else "DIFFERENT")
+    old_rows = load_rows()
+    old_answer = summ(old_rows, min_volume)
+
+    new_rows = load_rows()
+    rows_before = len(new_rows)
+    new_answer = volume_weighted_closes(new_rows, min_volume)
+
+    for line in old_answer:
+        print("old", line)
+    for line in new_answer:
+        print("new", line)
+    print("rows given to the new function:", rows_before, "before the call,", len(new_rows), "after")
+    print("SAME" if new_answer == old_answer and new_rows == old_rows else "DIFFERENT")

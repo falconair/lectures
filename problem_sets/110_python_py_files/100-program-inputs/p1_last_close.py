@@ -1,41 +1,14 @@
 """
-PROBLEM 1: make the program print the last close of the ticker given on the command line
+PROBLEM 1
+Practises: reading a command-line argument from sys.argv.
 
-YOUR TASK
-    Rewrite the lines below the line marked YOUR WORK. Do not change anything above it.
-    Your work is checked by running the commands at the end of this comment.
-    These are graded:
-      - the ticker is read from the command line
-      - it prints one line: the ticker, a space, and that ticker's last closing price
-      - no ticker on the command line: it prints one line that tells the user how to
-        run the program, and the exit status is 1
-      - a ticker that is not in prices.csv: it prints one line that says there is no
-        such ticker, and the exit status is 1
-      - it never ends with a Python error (a "Traceback")
-    Write your code directly below the line, not inside a function, as the lecture's
-    programs do. No "if __name__ == ..." is needed.
+Task: fill in the function ticker_from.
 
-THE PROGRAM
-    It looks up the most recent closing price of one stock in prices.csv.
-
-WHAT IS WRONG WITH IT (this is the bug you are fixing)
-    1. python p1_last_close.py         prints nothing
-    2. python p1_last_close.py MSFT    prints nothing
-
-WHEN YOU ARE DONE, these commands behave like this
-    python p1_last_close.py AAPL
-        AAPL 254.63
+To check your work, type:
     python p1_last_close.py MSFT
-        MSFT 517.95
-    python p1_last_close.py
-        (one line that says how to run the program)
-        exit status 1
-    python p1_last_close.py ZZZ
-        (one line that says there is no such ticker)
-        exit status 1
 
-    Exit status: a number a program returns when it ends (0 = it worked). To see it, the
-    very next command must be:  echo $?
+It should print the ticker that ticker_from returned, then that stock's last closing price:
+    MSFT 517.95
 """
 
 import csv
@@ -46,9 +19,31 @@ from pathlib import Path
 PRICES = Path(__file__).parent / "prices.csv"
 
 
-def last_close(ticker):
-    """Return the most recent closing price of ticker, or None if it is not in the file."""
-    price = None
+def ticker_from(argv: list[str]) -> str:
+    """Return the ticker the user typed on the command line.
+
+    If the user typed no ticker, print one line that says how to run the
+    program, then exit with status 1.
+
+    Args:
+        argv: the command line as a list of text, as in sys.argv. Its first
+            item is the program's name.
+
+    Returns:
+        The ticker.
+
+    Example:
+        ticker_from(["p1_last_close.py", "MSFT"])
+    returns
+        'MSFT'
+    """
+    raise NotImplementedError  # YOUR WORK: replace this line
+
+
+# ---- do not change anything below this line --------------------------------
+def last_close(ticker: str) -> float:
+    """Return the most recent closing price of ticker (nan if it is not in the file)."""
+    price = float("nan")
     with open(PRICES, newline="") as handle:
         for row in csv.DictReader(handle):  # one dict per line: row["close"]
             if row["ticker"] == ticker:
@@ -56,7 +51,6 @@ def last_close(ticker):
     return price
 
 
-# ---- YOUR WORK: everything below this line ---------------------------------
-ticker = "AAPL"
-price = last_close(ticker)
-f"{ticker} {price}"
+if __name__ == "__main__":
+    ticker = ticker_from(sys.argv)
+    print(ticker, last_close(ticker))
