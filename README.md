@@ -17,4 +17,4 @@ Visual Studio Code is a very useful tool
 Some classes require a linux virtual machine manager called Multipass
   - https://canonical.com/multipass
 
-Hi!
+Hiya!
