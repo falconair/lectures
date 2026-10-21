@@ -7,7 +7,7 @@ lectures/110_python_py_files/100-program-inputs.ipynb      the lecture
 problem_sets/110_python_py_files/100-program-inputs/       its problem set
 ```
 
-Your Canvas assignment says which problem set is due and when. You work on your own laptop, then copy your work to the course server. The steps are the same for every problem set. The commands below use `110_python_py_files/100-program-inputs` as the example: change those two names to the ones in your assignment.
+Your Canvas assignment says which problem set is due and when. You work on your own laptop, then copy your work to the course server. (The command-line and git sets are the exception: they are done on the server itself, see [the last section](#sets-done-on-the-server).) The steps are the same for every problem set. The commands below use `110_python_py_files/100-program-inputs` as the example: change those two names to the ones in your assignment.
 
 ## 1. Get the files
 
@@ -68,3 +68,17 @@ python p1_last_close.py MSFT
 A program that works on your laptop can fail on the server: a file was not copied, or your laptop has a package or a version of Python the server does not. If the output differs, fix the program on your laptop and copy it again.
 
 At the deadline, leave the files where they are on the server.
+
+## Sets done on the server
+
+The command-line and git sets have no programs. Each problem is a text file, `p1_....txt`, that says what to make and gives commands to check it, with what they should print. You do them on the course server, not on your laptop, and nothing is copied with `scp`.
+
+```bash
+# on your laptop: log in to the server
+ssh YOUR_USER_NAME@SERVER
+
+# on the server: read a problem (the same files are in your copy of this repository)
+cat /opt/lectures/problem_sets/060_learn_command_line/linux_command_line/p1_backup.txt
+```
+
+The files a problem starts from are in `/opt/lectures/problem_sets/...` on the server. You can read and copy them but not change them, so if you make a mess you can always copy them again. What you make goes in `~/problem_sets/<the set's path>/` in your home on the server, and is graded there at the deadline. Leave it where it is.

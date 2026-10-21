@@ -1,0 +1,43 @@
+PROBLEM 6
+Practises: deleting files with rm, and moving files into folders.
+
+Work on the course server. Log in with ssh and type these two commands first:
+    # make the folder you work in; -p also makes the folders above it
+    mkdir -p ~/problem_sets/060_learn_command_line/linux_command_line
+
+    # go into it
+    cd ~/problem_sets/060_learn_command_line/linux_command_line
+
+The files to copy are in /opt/lectures/problem_sets/060_learn_command_line/linux_command_line/data/
+
+Task: tidy up a downloads folder.
+  1. Copy the downloads folder from the data folder: type this command.
+         # copy the folder downloads as p6_clean_up; -r (recursive) copies everything inside it, folders and all
+         cp -r /opt/lectures/problem_sets/060_learn_command_line/linux_command_line/data/downloads p6_clean_up
+
+  2. In p6_clean_up, delete the duplicate executions_MSFT_copy.csv and the half-finished download
+     ohlcv_2025-09-11.csv.part.
+  3. Make two folders in p6_clean_up, executions and prices, and move executions_MSFT.csv into
+     executions and ohlcv_2025-09-11.csv into prices.
+
+To check your work, type these two commands:
+    cd ~/problem_sets/060_learn_command_line/linux_command_line
+    ls -l p6_clean_up p6_clean_up/executions p6_clean_up/prices
+
+They should print (your name and the times will differ):
+    p6_clean_up:
+    total 8
+    drwxrwxr-x 2 shahbaz shahbaz 4096 Oct 20 22:02 executions
+    drwxrwxr-x 2 shahbaz shahbaz 4096 Oct 20 22:02 prices
+
+    p6_clean_up/executions:
+    total 4
+    -rw-r--r-- 1 shahbaz shahbaz 1182 Oct 20 22:02 executions_MSFT.csv
+
+    p6_clean_up/prices:
+    total 4
+    -rw-r--r-- 1 shahbaz shahbaz 595 Oct 20 22:02 ohlcv_2025-09-11.csv
+
+NOTES
+- To start this problem again, delete its folder with rm -r p6_clean_up (-r deletes a folder and
+  everything in it, and there is no undo).

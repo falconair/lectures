@@ -1,0 +1,39 @@
+PROBLEM 1
+Practises: making folders with mkdir, moving around with cd, and an empty file with touch.
+
+Work on the course server. Log in with ssh and type these two commands first:
+    # make the folder you work in; -p also makes the folders above it
+    mkdir -p ~/problem_sets/060_learn_command_line/linux_command_line
+
+    # go into it
+    cd ~/problem_sets/060_learn_command_line/linux_command_line
+
+The files to copy are in /opt/lectures/problem_sets/060_learn_command_line/linux_command_line/data/
+
+Task: make the folders for a small project.
+  1. Make a folder p1_tree. Go into it and make two folders, prices and executions.
+  2. Go into prices and make three folders, 2025-09-09, 2025-09-10 and 2025-09-11.
+  3. Go back up to p1_tree (cd ..) and make an empty file README.txt with touch.
+
+To check your work, type these two commands:
+    cd ~/problem_sets/060_learn_command_line/linux_command_line
+    ls -R p1_tree
+
+They should print (-R lists every folder inside as well):
+    p1_tree:
+    README.txt  executions	prices
+
+    p1_tree/executions:
+
+    p1_tree/prices:
+    2025-09-09  2025-09-10	2025-09-11
+
+    p1_tree/prices/2025-09-09:
+
+    p1_tree/prices/2025-09-10:
+
+    p1_tree/prices/2025-09-11:
+
+NOTES
+- To start this problem again, delete its folder with rm -r p1_tree (-r deletes a folder and
+  everything in it, and there is no undo).

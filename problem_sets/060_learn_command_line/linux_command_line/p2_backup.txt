@@ -1,0 +1,37 @@
+PROBLEM 2
+Practises: copying files with cp, with absolute paths and with .. and .
+
+Work on the course server. Log in with ssh and type these two commands first:
+    # make the folder you work in; -p also makes the folders above it
+    mkdir -p ~/problem_sets/060_learn_command_line/linux_command_line
+
+    # go into it
+    cd ~/problem_sets/060_learn_command_line/linux_command_line
+
+The files to copy are in /opt/lectures/problem_sets/060_learn_command_line/linux_command_line/data/
+
+Task: keep a spare copy of a day's executions.
+  1. Make a folder p2_backup.
+  2. Copy executions_AAPL.csv and executions_MSFT.csv from the data folder into p2_backup.
+  3. Make a folder backup inside p2_backup and go into it. From there, copy both files from the
+     folder above: .. is the folder above, and . is the folder you are in.
+
+To check your work, type these two commands:
+    cd ~/problem_sets/060_learn_command_line/linux_command_line
+    ls -l p2_backup p2_backup/backup
+
+They should print (your name and the times will differ):
+    p2_backup:
+    total 12
+    drwxrwxr-x 2 shahbaz shahbaz 4096 Oct 20 22:02 backup
+    -rw-r--r-- 1 shahbaz shahbaz 1179 Oct 20 22:02 executions_AAPL.csv
+    -rw-r--r-- 1 shahbaz shahbaz 1182 Oct 20 22:02 executions_MSFT.csv
+
+    p2_backup/backup:
+    total 8
+    -rw-r--r-- 1 shahbaz shahbaz 1179 Oct 20 22:02 executions_AAPL.csv
+    -rw-r--r-- 1 shahbaz shahbaz 1182 Oct 20 22:02 executions_MSFT.csv
+
+NOTES
+- To start this problem again, delete its folder with rm -r p2_backup (-r deletes a folder and
+  everything in it, and there is no undo).

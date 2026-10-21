@@ -1,0 +1,29 @@
+PROBLEM 10
+Practises: replacing one character with another with tr.
+
+Work on the course server. Log in with ssh and type these two commands first:
+    # make the folder you work in; -p also makes the folders above it
+    mkdir -p ~/problem_sets/060_learn_command_line/linux_command_line
+
+    # go into it
+    cd ~/problem_sets/060_learn_command_line/linux_command_line
+
+The files to copy are in /opt/lectures/problem_sets/060_learn_command_line/linux_command_line/data/
+
+Task: make FIX messages readable.
+  1. Make a folder p10_fix_readable.
+  2. The fields of a FIX message are separated by a character you cannot see, number 1, which tr
+     writes as '\001'. Replace it with | in every line of fix_messages.log, and save the result in
+     p10_fix_readable/readable.log.
+
+To check your work, type these two commands:
+    cd ~/problem_sets/060_learn_command_line/linux_command_line
+    head -2 p10_fix_readable/readable.log
+
+They should print (the first two messages, with | between the fields):
+    20250910-00:02:34.713753 : 8=FIX.4.2|9=330|35=8|34=1962|49=ID1|52=20250910-04:02:34.713|56=ID2|1=ID6|6=32.98|11=ID3|14=10|17=ID5|20=0|30=ID7|31=32.98|32=10|37=ID4|38=10|39=2|40=2|44=32.98|54=2|55=SMCX|59=0|60=20250910-04:02:34.713|76=ID8|150=2|151=0|10=235|
+    20250910-00:06:14.467988 : 8=FIX.4.2|9=330|35=8|34=1979|49=ID1|52=20250910-04:06:14.467|56=ID2|1=ID12|6=105.79|11=ID9|14=5|17=ID11|20=0|30=ID7|31=105.79|32=5|37=ID10|38=5|39=2|40=2|44=105.79|54=1|55=CRWV|59=0|60=20250910-04:06:14.467|76=ID8|150=2|151=0|10=046|
+
+NOTES
+- To start this problem again, delete its folder with rm -r p10_fix_readable (-r deletes a folder and
+  everything in it, and there is no undo).
