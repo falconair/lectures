@@ -1,0 +1,48 @@
+PROBLEM 1
+Practises: making a repository, choosing what goes into each commit, keeping a file out of git.
+
+Work on the course server: log in with ssh, then do the steps below there.
+
+Task: start a repository for the commission calculator, one commit at a time.
+  1. Copy the project and make it a repository: type these commands.
+         # make the folder you work in; -p also makes the folders above it
+         mkdir -p ~/problem_sets/050_git_version_control/version_control_with_git
+
+         # go into it
+         cd ~/problem_sets/050_git_version_control/version_control_with_git
+
+         # copy the folder starter as p1_first_repo; -r (recursive) copies everything inside it, folders and all
+         cp -r /opt/lectures/problem_sets/050_git_version_control/version_control_with_git/starter p1_first_repo
+
+         # go into p1_first_repo
+         cd p1_first_repo
+
+         # make this folder a repository: git keeps the history in a hidden folder, .git
+         git init
+
+  2. Commit commission.py on its own. Then commit trades.csv in a second commit.
+  3. With nano, make a file notes.txt with a reminder to yourself in it, and a file .gitignore whose
+     one line is notes.txt. Commit .gitignore. notes.txt must never be committed.
+
+To check your work, type these three commands:
+    cd ~/problem_sets/050_git_version_control/version_control_with_git/p1_first_repo
+    git log --oneline --name-status
+    git status --short --ignored
+
+They should print (your hashes will differ and the messages are your own; A means that commit
+added the file, and !! that git is ignoring it):
+    39e8fdd (HEAD -> main) Ignore my scratch notes
+    A	.gitignore
+    48ce0e6 Add sample trades
+    A	trades.csv
+    1ab81d0 Add commission calculator
+    A	commission.py
+    !! notes.txt
+
+NOTES
+- Before your first commit on the server, tell git who you are: type the three git config commands
+  from section 1 of the lecture (user.name, user.email and init.defaultBranch main). If you made the
+  repository before that, git calls the main line master instead of main. That is fine.
+- nano FILE opens a file to edit: ctrl+O then enter saves it, ctrl+X leaves.
+- To start this problem again, delete its folder with rm -rf p1_first_repo (-rf also deletes the .git
+  folder inside it, and there is no undo).

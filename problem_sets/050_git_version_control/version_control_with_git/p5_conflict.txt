@@ -1,0 +1,61 @@
+PROBLEM 5
+Practises: resolving a merge conflict: two branches changed the same line.
+
+Work on the course server: log in with ssh, then do the steps below there.
+
+Task: two people lower the commission rate in different ways; keep main's.
+  1. Copy the project and make it a repository with one commit: type these commands.
+         # make the folder you work in; -p also makes the folders above it
+         mkdir -p ~/problem_sets/050_git_version_control/version_control_with_git
+
+         # go into it
+         cd ~/problem_sets/050_git_version_control/version_control_with_git
+
+         # copy the folder starter as p5_conflict; -r (recursive) copies everything inside it, folders and all
+         cp -r /opt/lectures/problem_sets/050_git_version_control/version_control_with_git/starter p5_conflict
+
+         # go into p5_conflict
+         cd p5_conflict
+
+         # make this folder a repository: git keeps the history in a hidden folder, .git
+         git init
+
+         # put every file on the stage (. means this folder)
+         git add .
+
+         # save what is on the stage in the history, with a message (-m)
+         git commit -m "Starting point"
+
+  2. Make a branch lower-rate and switch to it. With nano, change COMMISSION_PER_SHARE = 0.005
+     to 0.004, and commit.
+  3. Switch back to main. With nano, change the same line to 0.0035, and commit.
+  4. Merge lower-rate into main. git stops with a conflict. With nano, make commission.py say
+     COMMISSION_PER_SHARE = 0.0035, and delete the 0.004 line and the three lines git added
+     (<<<<<<<, =======, >>>>>>>). Then git add commission.py, git commit --no-edit,
+     and delete the branch.
+
+To check your work, type these three commands:
+    cd ~/problem_sets/050_git_version_control/version_control_with_git/p5_conflict
+    git log --oneline --graph --all
+    head -5 commission.py
+
+They should print (your hashes will differ, and the messages of your commits are your own):
+    *   f3f261d (HEAD -> main) Merge branch 'lower-rate'
+    |\  
+    | * 974bfc8 Lower commission to 0.004 per share
+    * | 984a4d8 Lower commission to 0.0035 per share
+    |/  
+    * fe12766 Starting point
+    """Work out what a day's trades cost us in commission."""
+    import csv
+
+    COMMISSION_PER_SHARE = 0.0035
+    MINIMUM_COMMISSION = 1.00
+
+NOTES
+- Before your first commit on the server, tell git who you are: type the three git config commands
+  from section 1 of the lecture (user.name, user.email and init.defaultBranch main). If you made the
+  repository before that, git calls the main line master instead of main. That is fine.
+- nano FILE opens a file to edit: ctrl+O then enter saves it, ctrl+X leaves.
+- To start this problem again, delete its folder with rm -rf p5_conflict (-rf also deletes the .git
+  folder inside it, and there is no undo).

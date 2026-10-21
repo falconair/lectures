@@ -1,0 +1,38 @@
+PROBLEM 7
+Practises: head and tail, and saving what a command prints in a file with >.
+
+Work on the course server. Log in with ssh and type these two commands first:
+    # make the folder you work in; -p also makes the folders above it
+    mkdir -p ~/problem_sets/060_learn_command_line/linux_command_line
+
+    # go into it
+    cd ~/problem_sets/060_learn_command_line/linux_command_line
+
+The files to copy are in /opt/lectures/problem_sets/060_learn_command_line/linux_command_line/data/
+
+Task: save the start and the end of a day's executions.
+  1. Make a folder p7_head_tail.
+  2. Save the header and the first five executions of executions.csv in p7_head_tail/first_five.csv,
+     and the last five executions in p7_head_tail/last_five.csv. head -n and tail -n print n lines;
+     > puts what a command prints into a file instead of on the screen.
+
+To check your work, type these two commands:
+    cd ~/problem_sets/060_learn_command_line/linux_command_line
+    cat p7_head_tail/first_five.csv p7_head_tail/last_five.csv
+
+They should print (the six lines of first_five.csv, then the five of last_five.csv):
+    order_id,order_time,execution_time,symbol,side,order_qty,limit_price,execution_price,exchange
+    ID1542,20250910-08:00:00.377,20250910-08:00:00.509,YANG,1,27,23.700000,23.170000,ID1516
+    ID1572,20250910-08:00:00.450,20250910-08:00:00.692,IREN,1,30,31.290000,31.290000,ID1516
+    ID1632,20250910-08:00:00.747,20250910-08:00:00.982,DJT,2,53,16.910000,16.910000,ID1516
+    ID1711,20250910-08:00:00.866,20250910-08:00:01.006,AMD,2,80,159.560000,160.110000,ID1516
+    ID1732,20250910-08:00:00.920,20250910-08:00:01.042,SOFI,2,4,25.860000,25.890000,ID1516
+    ID4408,20250910-08:00:09.373,20250910-08:00:09.483,NAKA,1,500,7.060000,6.911220,ID1516
+    ID4438,20250910-08:00:09.479,20250910-08:00:09.589,UFG,1,4,8.910000,8.910000,ID1516
+    ID3191,20250910-08:00:04.859,20250910-08:00:09.982,ASST,2,464,12.600000,12.600000,ID1516
+    ID4632,20250910-08:00:10.262,20250910-08:00:10.369,RMTI,1,24,1.800000,1.800000,ID1516
+    ID4682,20250910-08:00:10.533,20250910-08:00:10.638,IXHL,1,3,0.540000,0.540000,ID1516
+
+NOTES
+- To start this problem again, delete its folder with rm -r p7_head_tail (-r deletes a folder and
+  everything in it, and there is no undo).

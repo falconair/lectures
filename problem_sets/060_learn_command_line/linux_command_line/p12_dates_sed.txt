@@ -1,0 +1,29 @@
+PROBLEM 12
+Practises: replacing text with sed.
+
+Work on the course server. Log in with ssh and type these two commands first:
+    # make the folder you work in; -p also makes the folders above it
+    mkdir -p ~/problem_sets/060_learn_command_line/linux_command_line
+
+    # go into it
+    cd ~/problem_sets/060_learn_command_line/linux_command_line
+
+The files to copy are in /opt/lectures/problem_sets/060_learn_command_line/linux_command_line/data/
+
+Task: write the times of executions the way people read them.
+  1. Make a folder p12_dates_sed.
+  2. The times in executions_AAPL.csv look like 20250910-08:01:56.292. With sed, change every
+     20250910- into 2025-09-10 and a space, and save the result in p12_dates_sed/executions_AAPL.csv.
+
+To check your work, type these two commands:
+    cd ~/problem_sets/060_learn_command_line/linux_command_line
+    head -3 p12_dates_sed/executions_AAPL.csv
+
+They should print (the header and the first two executions):
+    order_id,order_time,execution_time,symbol,side,order_qty,limit_price,execution_price,exchange
+    ID8195,2025-09-10 08:01:56.292,2025-09-10 08:02:05.550,AAPL,1,10,234.170000,234.170000,ID1516
+    ID14463,2025-09-10 08:06:48.677,2025-09-10 08:10:19.403,AAPL,1,41,233.860000,233.860000,ID1516
+
+NOTES
+- To start this problem again, delete its folder with rm -r p12_dates_sed (-r deletes a folder and
+  everything in it, and there is no undo).

@@ -1,0 +1,51 @@
+PROBLEM 7
+Practises: a second working folder on its own branch, with git worktree.
+
+Work on the course server: log in with ssh, then do the steps below there.
+
+Task: write a README on a branch, in a folder of its own, without touching the folder you work in.
+  1. Copy the project and make it a repository with one commit: type these commands.
+         # make the folder you work in; -p also makes the folders above it
+         mkdir -p ~/problem_sets/050_git_version_control/version_control_with_git
+
+         # go into it
+         cd ~/problem_sets/050_git_version_control/version_control_with_git
+
+         # copy the folder starter as p7_worktree; -r (recursive) copies everything inside it, folders and all
+         cp -r /opt/lectures/problem_sets/050_git_version_control/version_control_with_git/starter p7_worktree
+
+         # go into p7_worktree
+         cd p7_worktree
+
+         # make this folder a repository: git keeps the history in a hidden folder, .git
+         git init
+
+         # put every file on the stage (. means this folder)
+         git add .
+
+         # save what is on the stage in the history, with a message (-m)
+         git commit -m "Starting point"
+
+  2. Make a second working folder next to it, on a new branch:
+     git worktree add ../p7_worktree_readme -b add-readme
+  3. Go into ../p7_worktree_readme. With nano, write a README.md, and commit it there.
+     Leave both folders as they are: do not merge or remove anything.
+
+To check your work, type these three commands:
+    cd ~/problem_sets/050_git_version_control/version_control_with_git/p7_worktree
+    git worktree list
+    git log --oneline --graph --all
+
+They should print (your hashes will differ, and your user name is in the paths):
+    /home/shahbaz/problem_sets/050_git_version_control/version_control_with_git/p7_worktree        fe12766 [main]
+    /home/shahbaz/problem_sets/050_git_version_control/version_control_with_git/p7_worktree_readme ce3eb9c [add-readme]
+    * ce3eb9c (add-readme) Add a README
+    * fe12766 (HEAD -> main) Starting point
+
+NOTES
+- Before your first commit on the server, tell git who you are: type the three git config commands
+  from section 1 of the lecture (user.name, user.email and init.defaultBranch main). If you made the
+  repository before that, git calls the main line master instead of main. That is fine.
+- nano FILE opens a file to edit: ctrl+O then enter saves it, ctrl+X leaves.
+- To start this problem again, delete its folder with rm -rf p7_worktree (-rf also deletes the .git
+  folder inside it, and there is no undo).
