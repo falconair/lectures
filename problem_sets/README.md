@@ -78,7 +78,7 @@ The command-line and git sets have no programs. Each problem is a text file, `p1
 ssh YOUR_USER_NAME@SERVER
 
 # on the server: read a problem (the same files are in your copy of this repository)
-cat /opt/lectures/problem_sets/060_learn_command_line/linux_command_line/p1_backup.txt
+cat /opt/lectures/problem_sets/060_learn_command_line/linux_command_line/p2_backup.txt
 ```
 
 The files a problem starts from are in `/opt/lectures/problem_sets/...` on the server. You can read and copy them but not change them, so if you make a mess you can always copy them again. What you make goes in `~/problem_sets/<the set's path>/` in your home on the server, and is graded there at the deadline. Leave it where it is.
