@@ -58,4 +58,5 @@ if __name__ == "__main__":
 
 # NOTES
 #   The lecture uses .idxmax() on a column: it gives the index label of the
-#   largest value. It works on each group of a groupby too.
+#   largest value (with the default index, a row number). It works on each
+#   group of a groupby too.

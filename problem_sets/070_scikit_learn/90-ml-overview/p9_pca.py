@@ -1,6 +1,6 @@
 """
 PROBLEM 9
-Practises: scaling the columns before PCA, and reading how many columns are worth keeping.
+Practises: scaling the columns before PCA, and reading how many PCA columns are worth keeping.
 
 Task: fill in the function cumulative_variance.
 
@@ -8,7 +8,7 @@ To check your work, type:
     python p9_pca.py
 
 It should print what cumulative_variance returned, then how many PCA
-columns keep 90% of the variance. Yours may differ in the last digit:
+columns it takes to keep 90% of the variance. Yours may differ in the last digit:
     1    0.389
     2    0.600
     3    0.734
@@ -17,7 +17,7 @@ columns keep 90% of the variance. Yours may differ in the last digit:
     6    0.994
     7    1.000
     8    1.000
-    5 of the 8 columns keep 90% of the variance
+    the first 5 of the 8 PCA columns keep 90% of the variance
 """
 
 from pathlib import Path
@@ -67,4 +67,4 @@ if __name__ == "__main__":
     features_df = features_df[~features_df["is_outlier"]]  # leave out the 25 most unusual stocks, as the lecture does
     kept = cumulative_variance(features_df)
     print(kept.round(3).to_string())
-    print(f"{(kept < 0.9).sum() + 1} of the {len(FEATURES)} columns keep 90% of the variance")
+    print(f"the first {(kept < 0.9).sum() + 1} of the {len(FEATURES)} PCA columns keep 90% of the variance")

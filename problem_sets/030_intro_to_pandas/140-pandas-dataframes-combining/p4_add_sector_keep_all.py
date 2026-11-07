@@ -1,6 +1,6 @@
 """
 PROBLEM 4
-Practises: joining a column to an index, and keeping the rows that have no match.
+Practises: joining a column to an index, keeping every row of the first table.
 
 Task: fill in the function add_sector_keep_all.
 
@@ -8,7 +8,8 @@ To check your work, type:
     python p4_add_sector_keep_all.py
 
 It should print what add_sector_keep_all returned for the closes of
-2025-09-10. F and GME are not in companies.csv, so their sector is missing (NaN):
+2025-09-10. F and GME are not in companies.csv, so their sector is missing (NaN);
+ORCL is in companies.csv but has no close, so it is not in the result:
       ticker   close              sector
     0   AAPL  226.79          Technology
     1   AMZN  230.33   Consumer Cyclical
@@ -45,9 +46,9 @@ def add_sector_keep_all(day_df: pd.DataFrame, sector_df: pd.DataFrame) -> pd.Dat
     Returns:
         A table with as many rows as day_df and the columns ticker, close and sector.
 
-    Example:
+    Example. XOM is in sector_df but not in day_df, so it is not in the result:
         day_df = pd.DataFrame({"ticker": ["F", "KO"], "close": [11.42, 67.82]})
-        sector_df = pd.DataFrame({"sector": ["Consumer Defensive"]}, index=["KO"])
+        sector_df = pd.DataFrame({"sector": ["Consumer Defensive", "Energy"]}, index=["KO", "XOM"])
         add_sector_keep_all(day_df, sector_df)
     returns
           ticker  close              sector
