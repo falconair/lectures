@@ -1,3 +1,4 @@
+my name is shahbaz
 # Lecture notes for various classes
 This repository contains lectures for various classes in the Applied Data Science and Financial Math programs at the University Of Chicago.
 
